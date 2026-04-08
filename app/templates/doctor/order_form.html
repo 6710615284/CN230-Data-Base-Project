@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}สั่งตรวจ{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('doctor.dashboard') }}" class="nav-tab">ค้นหาผู้ป่วย</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>สั่งตรวจ</h1>
+  <p class="sub">{{ patient.name }} <span class="mono">{{ patient.HN }}</span></p>
+</div>
+
+<form method="POST" class="card">
+  <div class="form-row">
+    <div class="form-group">
+      <label>ระดับความเร่งด่วน</label>
+      <select name="priority" class="input">
+        <option value="routine">Routine — ปกติ</option>
+        <option value="urgent">Urgent — เร่งด่วน</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-top:16px">
+    <label>เลือกรายการตรวจ</label>
+    <div class="test-list">
+      {% for t in test_types %}
+      <label class="test-item">
+        <input type="checkbox" name="test_ids" value="{{ t.test_id }}"
+               onchange="updateTotal()">
+        <span class="test-name">{{ t.name }}</span>
+        <span class="test-unit">{{ t.unit }}</span>
+        <span class="test-range">{{ t.normal_min }}–{{ t.normal_max }}</span>
+        <span class="test-price" data-price="{{ t.price }}">฿{{ "%.0f"|format(t.price) }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="order-summary" id="summary" style="display:none">
+    รวม: <strong id="total-price">฿0</strong>
+  </div>
+
+  <div class="form-actions">
+    <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary">ยกเลิก</a>
+    <button type="submit" class="btn btn-primary">ยืนยันการสั่งตรวจ</button>
+  </div>
+</form>
+
+<script>
+function updateTotal() {
+  const checked = document.querySelectorAll('input[name=test_ids]:checked');
+  let total = 0;
+  checked.forEach(cb => {
+    const price = cb.closest('label').querySelector('.test-price').dataset.price;
+    total += parseFloat(price);
+  });
+  document.getElementById('total-price').textContent = '฿' + total.toLocaleString();
+  document.getElementById('summary').style.display = checked.length ? 'block' : 'none';
+}
+</script>
+{% endblock %}

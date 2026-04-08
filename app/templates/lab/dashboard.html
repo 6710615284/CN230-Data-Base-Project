@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Lab Dashboard{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('lab.dashboard') }}" class="nav-tab active">คิวรอบันทึกผล</a>
+  <a href="{{ url_for('lab.profile') }}"   class="nav-tab">โปรไฟล์</a>
+
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">คิวรอบันทึกผล</h1>
+  <span class="badge-count">{{ orders|length }} รายการ</span>
+</div>
+
+{% if orders %}
+<div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Priority</th>
+        <th>HN / ผู้ป่วย</th>
+        <th>แพทย์</th>
+        <th>เวลาสั่ง</th>
+        <th>รายการตรวจ</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr class="{% if o.priority == 'urgent' %}row-urgent{% endif %}">
+        <td class="col-id">{{ o.order_id }}</td>
+        <td>
+          {% if o.priority == 'urgent' %}
+            <span class="badge badge-urgent">🔴 Urgent</span>
+          {% else %}
+            <span class="badge badge-routine">Routine</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="patient-info">
+            <span class="hn">{{ o.HN }}</span>
+            <span class="patient-name">{{ o.patient_name }}</span>
+          </div>
+        </td>
+        <td>{{ o.doctor_name }}</td>
+        <td class="col-date">{{ o.ordered_at.strftime('%d/%m/%Y %H:%M') if o.ordered_at else '-' }}</td>
+        <td>
+          <span class="item-count">
+            {{ o.pending_items }}/{{ o.total_items }} รายการ
+          </span>
+        </td>
+        <td>
+          <a href="{{ url_for('lab.order_detail', order_id=o.order_id) }}"
+             class="btn btn-primary btn-sm">บันทึกผล →</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">✅</div>
+  <p>ไม่มีคิวรอดำเนินการ</p>
+</div>
+{% endif %}
+
+<style>
+.page-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.page-title  { font-size:1.5rem; font-weight:700; margin:0; }
+.badge-count { background:#e8f4fd; color:#1a6fa8; padding:4px 12px; border-radius:20px; font-size:.85rem; font-weight:600; }
+
+.table-wrapper { overflow-x:auto; }
+.data-table  { width:100%; border-collapse:collapse; }
+.data-table th { background:#f8f9fa; text-align:left; padding:10px 14px; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:#666; border-bottom:2px solid #e0e0e0; }
+.data-table td { padding:12px 14px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+.data-table tbody tr:hover { background:#fafafa; }
+.row-urgent  { border-left:3px solid #e53935; }
+
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:600; }
+.badge-urgent  { background:#fdecea; color:#c62828; }
+.badge-routine { background:#f0f0f0; color:#555; }
+
+.patient-info { display:flex; flex-direction:column; gap:2px; }
+.hn           { font-size:.75rem; color:#888; }
+.patient-name { font-weight:600; }
+
+.col-id   { width:60px; color:#aaa; font-size:.85rem; }
+.col-date { font-size:.85rem; color:#555; white-space:nowrap; }
+.item-count { font-size:.85rem; color:#e65100; font-weight:600; }
+
+.btn { display:inline-block; padding:7px 16px; border-radius:6px; font-size:.85rem; font-weight:600; text-decoration:none; cursor:pointer; border:none; }
+.btn-primary { background:#1a6fa8; color:#fff; }
+.btn-primary:hover { background:#155d8f; }
+.btn-sm { padding:5px 12px; font-size:.8rem; }
+
+.empty-state { text-align:center; padding:60px 0; color:#999; }
+.empty-icon  { font-size:3rem; margin-bottom:12px; }
+</style>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}บันทึกผลตรวจ — Order #{{ order.order_id }}{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('lab.dashboard') }}" class="nav-link">← คิวรอตรวจ</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">บันทึกผลตรวจ — Order #{{ order.order_id }}</h1>
+    <div class="order-meta">
+      <span>{{ order.HN }}</span> · <span>{{ order.patient_name }}</span>
+      · <span>แพทย์: {{ order.doctor_name }}</span>
+      · <span>{{ order.ordered_at.strftime('%d/%m/%Y %H:%M') if order.ordered_at else '' }}</span>
+      · {% if order.priority == 'urgent' %}
+          <span class="badge badge-urgent">🔴 Urgent</span>
+        {% else %}
+          <span class="badge badge-routine">Routine</span>
+        {% endif %}
+    </div>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('lab.order_detail', order_id=order.order_id) }}">
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>รายการตรวจ</th>
+          <th>ค่าปกติ</th>
+          <th>หน่วย</th>
+          <th>ค่าที่วัดได้</th>
+          <th>สถานะ</th>
+          <th>บันทึกโดย</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr class="{% if item.is_abnormal %}row-abnormal{% endif %}">
+          <td class="test-name">{{ item.test_name }}</td>
+          <td class="col-range">
+            {% if item.normal_min is not none and item.normal_max is not none %}
+              {{ item.normal_min }} – {{ item.normal_max }}
+            {% elif item.normal_min is not none %}
+              ≥ {{ item.normal_min }}
+            {% elif item.normal_max is not none %}
+              ≤ {{ item.normal_max }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="col-unit">{{ item.unit or '—' }}</td>
+          <td class="col-input">
+            {% if item.item_status == 'completed' %}
+              <span class="recorded-value {% if item.is_abnormal %}abnormal{% endif %}">
+                {{ item.value }}
+                {% if item.is_abnormal %}<span class="abnormal-flag">⚠</span>{% endif %}
+              </span>
+            {% else %}
+              <input
+                type="number"
+                step="any"
+                name="value_{{ item.order_item_id }}"
+                class="value-input"
+                placeholder="กรอกค่า"
+              >
+            {% endif %}
+          </td>
+          <td>
+            {% if item.item_status == 'completed' %}
+              <span class="badge badge-done">✓ บันทึกแล้ว</span>
+            {% else %}
+              <span class="badge badge-pending">รอกรอก</span>
+            {% endif %}
+          </td>
+          <td class="col-recorded">
+            {% if item.item_status == 'completed' %}
+              <div>{{ item.recorded_by_name }}</div>
+              <div class="recorded-time">{{ item.recorded_at.strftime('%H:%M') if item.recorded_at else '' }}</div>
+              <a href="{{ url_for('lab.edit_result', result_id=item.result_id) }}"
+                 class="btn-edit">แก้ไข</a>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% set has_pending = items | selectattr('item_status', 'eq', 'pending') | list %}
+  {% if has_pending %}
+  <div class="form-actions">
+    <a href="{{ url_for('lab.dashboard') }}" class="btn btn-secondary">ยกเลิก</a>
+    <button type="submit" class="btn btn-primary">💾 บันทึกผล</button>
+  </div>
+  {% else %}
+  <div class="completed-notice">✅ บันทึกผลครบทุกรายการแล้ว</div>
+  {% endif %}
+</form>
+
+<style>
+.page-header { margin-bottom:20px; }
+.page-title  { font-size:1.4rem; font-weight:700; margin:0 0 6px; }
+.order-meta  { font-size:.85rem; color:#666; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+
+.badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:.78rem; font-weight:600; }
+.badge-urgent  { background:#fdecea; color:#c62828; }
+.badge-routine { background:#f0f0f0; color:#555; }
+.badge-done    { background:#e8f5e9; color:#2e7d32; }
+.badge-pending { background:#fff3e0; color:#e65100; }
+
+.table-wrapper { overflow-x:auto; margin-bottom:20px; }
+.data-table  { width:100%; border-collapse:collapse; }
+.data-table th { background:#f8f9fa; text-align:left; padding:10px 14px; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:#666; border-bottom:2px solid #e0e0e0; }
+.data-table td { padding:11px 14px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+.row-abnormal { background:#fff8f8; }
+
+.test-name   { font-weight:600; }
+.col-range   { font-size:.85rem; color:#666; white-space:nowrap; }
+.col-unit    { font-size:.85rem; color:#888; }
+.col-input   { min-width:130px; }
+.col-recorded { font-size:.82rem; color:#666; }
+.recorded-time { color:#aaa; font-size:.75rem; }
+
+.value-input { width:110px; padding:6px 10px; border:1px solid #ccc; border-radius:6px; font-size:.95rem; }
+.value-input:focus { outline:none; border-color:#1a6fa8; box-shadow:0 0 0 2px rgba(26,111,168,.15); }
+
+.recorded-value { font-weight:700; }
+.recorded-value.abnormal { color:#c62828; }
+.abnormal-flag { color:#e53935; margin-left:4px; }
+
+.btn-edit { display:inline-block; margin-top:4px; font-size:.75rem; color:#1a6fa8; text-decoration:underline; }
+
+.form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+.btn { display:inline-block; padding:9px 22px; border-radius:7px; font-size:.9rem; font-weight:600; text-decoration:none; cursor:pointer; border:none; }
+.btn-primary   { background:#1a6fa8; color:#fff; }
+.btn-primary:hover { background:#155d8f; }
+.btn-secondary { background:#f0f0f0; color:#333; }
+.btn-secondary:hover { background:#e0e0e0; }
+
+.completed-notice { text-align:center; padding:16px; color:#2e7d32; font-weight:600; background:#e8f5e9; border-radius:8px; margin-top:8px; }
+</style>
+{% endblock %}

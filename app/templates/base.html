@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HLIS — {% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">HLIS<span>.</span></div>
+    <div class="nav-links">
+      {% block nav_links %}{% endblock %}
+    </div>
+    <div class="nav-right">
+      <span class="nav-user">{{ session.name }}</span>
+      <span class="nav-role role-{{ session.role }}">{{ session.role }}</span>
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout">ออกจากระบบ</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

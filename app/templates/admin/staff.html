@@ -1,0 +1,80 @@
+{% extends 'base.html' %} {% block title %}จัดการเจ้าหน้าที่{% endblock %} {% block nav_links %}
+<a href="{{ url_for('admin.patients') }}" class="nav-tab">ผู้ป่วย</a>
+<a href="{{ url_for('admin.staff') }}" class="nav-tab active">เจ้าหน้าที่</a>
+<a href="{{ url_for('admin.testtypes') }}" class="nav-tab">ประเภทการตรวจ</a>
+<a href="{{ url_for('admin.billing') }}" class="nav-tab">บิล</a> {% endblock %} {% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+        <h1>เจ้าหน้าที่ทั้งหมด</h1>
+        <p class="sub">จัดการบัญชีผู้ใช้งานในระบบ</p>
+    </div>
+    <a href="{{ url_for('admin.staff_new') }}" class="btn btn-primary">+ เพิ่มเจ้าหน้าที่</a>
+</div>
+
+<!-- Reset-password modal -->
+<div id="pw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center;">
+    <div class="card" style="width:360px;padding:24px;">
+        <h3 style="margin-bottom:16px;font-size:16px;">รีเซ็ตรหัสผ่าน</h3>
+        <form method="POST" id="pw-form">
+            <div class="form-group">
+                <label>รหัสผ่านใหม่</label>
+                <input class="input" type="password" name="new_password" id="pw-input" required minlength="6">
+            </div>
+            <div class="form-actions">
+                <button type="button" onclick="closePwModal()" class="btn btn-secondary">ยกเลิก</button>
+                <button type="submit" class="btn btn-primary">บันทึก</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if staff_list %}
+<div class="card" style="padding:0;overflow:hidden;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ชื่อ</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th style="width:200px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in staff_list %}
+            <tr>
+                <td class="mono">{{ "%04d"|format(s.staff_id) }}</td>
+                <td>{{ s.name }}</td>
+                <td class="mono">{{ s.username }}</td>
+                <td><span class="badge role-{{ s.role }}">{{ s.role }}</span></td>
+                <td>
+                    <a href="{{ url_for('admin.staff_edit', sid=s.staff_id) }}" class="btn btn-secondary btn-sm">แก้ไข</a>
+                    <button class="btn btn-secondary btn-sm" onclick="openPwModal({{ s.staff_id }}, '{{ s.name }}')">รีเซ็ต PW</button>
+                    <form method="POST" action="{{ url_for('admin.staff_delete', sid=s.staff_id) }}" style="display:inline;">
+                        <button class="btn btn-danger btn-sm" onclick="return confirm('ยืนยันการลบ?')">
+              ลบ
+            </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="empty">ยังไม่มีเจ้าหน้าที่ในระบบ</p>
+{% endif %}
+
+<script>
+    function openPwModal(sid, name) {
+        document.getElementById('pw-form').action = '/admin/staff/reset-pw/' + sid;
+        document.getElementById('pw-input').value = '';
+        const m = document.getElementById('pw-modal');
+        m.style.display = 'flex';
+    }
+
+    function closePwModal() {
+        document.getElementById('pw-modal').style.display = 'none';
+    }
+</script>
+{% endblock %}

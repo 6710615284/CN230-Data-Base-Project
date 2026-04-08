@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}จัดการผู้ป่วย{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('admin.patients') }}"  class="nav-tab active">ผู้ป่วย</a>
+  <a href="{{ url_for('admin.staff') }}"     class="nav-tab">เจ้าหน้าที่</a>
+  <a href="{{ url_for('admin.testtypes') }}" class="nav-tab">ประเภทการตรวจ</a>
+  <a href="{{ url_for('admin.billing') }}"   class="nav-tab">บิล</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
+  <div>
+    <h1>ผู้ป่วยทั้งหมด</h1>
+    <p class="sub">จัดการข้อมูลผู้ป่วยในระบบ</p>
+  </div>
+  <a href="{{ url_for('admin.patient_new') }}" class="btn btn-primary">+ เพิ่มผู้ป่วย</a>
+</div>
+
+<form method="GET" class="search-form">
+  <input type="text" name="q" value="{{ q }}" placeholder="ค้นหาด้วย HN หรือชื่อ..." class="input-search" autofocus>
+  <button type="submit" class="btn btn-primary">ค้นหา</button>
+  {% if q %}<a href="{{ url_for('admin.patients') }}" class="btn btn-secondary">ล้าง</a>{% endif %}
+</form>
+
+{% if patients %}
+<div class="card" style="padding:0;overflow:hidden;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>HN</th><th>ชื่อ-นามสกุล</th><th>วันเกิด</th>
+        <th>หมู่เลือด</th><th>เบอร์โทร</th><th style="width:140px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in patients %}
+      <tr>
+        <td class="mono">{{ p.HN }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.dob or '—' }}</td>
+        <td>{{ p.blood_type or '—' }}</td>
+        <td>{{ p.contact_phone or '—' }}</td>
+        <td>
+          <a href="{{ url_for('admin.patient_edit', pid=p.patient_id) }}"
+             class="btn btn-secondary btn-sm">แก้ไข</a>
+          <form method="POST" action="{{ url_for('admin.patient_delete', pid=p.patient_id) }}"
+                style="display:inline"
+                onsubmit="return confirm('ลบผู้ป่วย {{ p.name }} ใช่ไหม?')">
+            <button class="btn btn-danger btn-sm">ลบ</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif q %}
+  <p class="empty">ไม่พบผู้ป่วยที่ค้นหา "{{ q }}"</p>
+{% else %}
+  <p class="empty">ยังไม่มีผู้ป่วยในระบบ</p>
+{% endif %}
+{% endblock %}

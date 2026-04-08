@@ -1,0 +1,50 @@
+{% extends 'base.html' %} {% block title %}{{ 'เพิ่ม' if action=='new' else 'แก้ไข' }}ผู้ป่วย{% endblock %} {% block nav_links %}
+<a href="{{ url_for('admin.patients') }}" class="nav-tab active">ผู้ป่วย</a>
+<a href="{{ url_for('admin.staff') }}" class="nav-tab">เจ้าหน้าที่</a>
+<a href="{{ url_for('admin.testtypes') }}" class="nav-tab">ประเภทการตรวจ</a>
+<a href="{{ url_for('admin.billing') }}" class="nav-tab">บิล</a> {% endblock %} {% block content %}
+<div class="page-header">
+    <h1>{{ 'เพิ่มผู้ป่วยใหม่' if action=='new' else 'แก้ไขข้อมูลผู้ป่วย' }}</h1>
+</div>
+
+<div class="card" style="max-width:560px;">
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label>HN</label> {% if action == 'new' %}
+                <input class="input" value="Auto-generated" disabled style="opacity:.6"> {% else %}
+                <input class="input" value="{{ patient.HN }}" disabled style="opacity:.6"> {% endif %}
+            </div>
+            <div class="form-group">
+                <label>ชื่อ-นามสกุล <span style="color:var(--red)">*</span></label>
+                <input class="input" name="name" value="{{ patient.name or '' }}" required>
+            </div>
+        </div>
+        <div class="form-row" style="margin-top:12px">
+            <div class="form-group">
+                <label>วันเกิด</label>
+                <input class="input" type="date" name="dob" value="{{ patient.dob or '' }}">
+            </div>
+            <div class="form-group">
+                <label>หมู่เลือด</label>
+                <select class="input" name="blood_type">
+          <option value="">— ไม่ระบุ —</option>
+          {% for bt in ['A','B','AB','O'] %}
+          <option value="{{ bt }}" {{ 'selected' if patient.blood_type == bt }}>{{ bt }}</option>
+          {% endfor %}
+        </select>
+            </div>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+            <label>เบอร์โทรศัพท์</label>
+            <input class="input" name="contact_phone" value="{{ patient.contact_phone or '' }}" placeholder="เช่น 081-234-5678">
+        </div>
+        <div class="form-actions">
+            <a href="{{ url_for('admin.patients') }}" class="btn btn-secondary">ยกเลิก</a>
+            <button type="submit" class="btn btn-primary">
+        {{ 'เพิ่มผู้ป่วย' if action=='new' else 'บันทึกการแก้ไข' }}
+      </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %} {% block title %}บิล — {{ patient.name }}{% endblock %} {% block nav_links %}
+<a href="{{ url_for('admin.patients') }}" class="nav-tab">ผู้ป่วย</a>
+<a href="{{ url_for('admin.staff') }}" class="nav-tab">เจ้าหน้าที่</a>
+<a href="{{ url_for('admin.testtypes') }}" class="nav-tab">ประเภทการตรวจ</a>
+<a href="{{ url_for('admin.billing') }}" class="nav-tab active">บิล</a> {% endblock %} {% block content %}
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+    <div>
+        <h1>{{ patient.name }}</h1>
+        <p class="sub">HN: {{ patient.HN }} • รายละเอียดบิลแยกตาม Order</p>
+    </div>
+    <a href="{{ url_for('admin.billing') }}" class="btn btn-secondary">← กลับ</a>
+</div>
+
+{% if items %} {% set orders = {} %} {% for item in items %} {% set _ = orders.__setitem__(item.order_id, item) if item.order_id not in orders else None %} {% endfor %} {% set current_order = namespace(id=None) %} {% set order_total = namespace(val=0)
+%}
+
+<div class="card" style="padding:0;overflow:hidden;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order #</th>
+                <th>วันที่</th>
+                <th>การตรวจ</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th style="text-align:right">ราคา</th>
+                <th style="text-align:right">ส่วนลด</th>
+                <th style="text-align:right">สุทธิ</th>
+                <th style="width:100px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr {% if item.status=='cancelled' %}style="opacity:.5" {% endif %}>
+                <td class="mono">{{ item.order_id }}</td>
+                <td style="font-size:12px;color:var(--text2)">{{ item.ordered_at.strftime('%d/%m/%Y %H:%M') if item.ordered_at else '—' }}</td>
+                <td>{{ item.test_name }}</td>
+                <td><span class="badge badge-{{ item.priority }}">{{ item.priority }}</span></td>
+                <td><span class="badge badge-{{ item.status }}">{{ item.status }}</span></td>
+                <td style="text-align:right">{{ '%.2f'|format(item.unit_price) }}</td>
+                <td style="text-align:right;color:var(--red)">
+                    {% if item.discount %}−{{ '%.2f'|format(item.discount) }}{% else %}—{% endif %}
+                </td>
+                <td style="text-align:right;font-weight:500;">{{ '%.2f'|format(item.total) }}</td>
+                <td>
+                    {% if item.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('admin.order_cancel', order_id=item.order_id) }}" onsubmit="return confirm('ยกเลิก Order #{{ item.order_id }} ใช่ไหม?')">
+                        <button class="btn btn-danger btn-sm">ยกเลิก</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="background:var(--bg);">
+                <td colspan="7" style="padding:10px 12px;font-weight:600;font-size:13px;">ยอดรวม</td>
+                <td style="text-align:right;padding:10px 12px;font-weight:700;color:var(--blue);">
+                    {{ '%.2f'|format(items | rejectattr('status', 'eq', 'cancelled') | sum(attribute='total')) }}
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% else %}
+<p class="empty">ยังไม่มีบิลสำหรับผู้ป่วยนี้</p>
+{% endif %} {% endblock %}

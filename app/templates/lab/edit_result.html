@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}แก้ไขผลตรวจ{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('lab.order_detail', order_id=result.order_id) }}" class="nav-link">← กลับหน้าบันทึก</a>
+{% endblock %}
+
+{% block content %}
+<div class="edit-card">
+  <div class="edit-header">
+    <h1 class="page-title">แก้ไขผลตรวจ</h1>
+    <p class="edit-sub">Order #{{ result.order_id }} · {{ result.HN }} {{ result.patient_name }}</p>
+  </div>
+
+  <div class="test-info-box">
+    <div class="info-row">
+      <span class="info-label">รายการตรวจ</span>
+      <span class="info-value bold">{{ result.test_name }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">หน่วย</span>
+      <span class="info-value">{{ result.unit or '—' }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">ค่าปกติ</span>
+      <span class="info-value">
+        {% if result.normal_min is not none and result.normal_max is not none %}
+          {{ result.normal_min }} – {{ result.normal_max }} {{ result.unit or '' }}
+        {% elif result.normal_min is not none %}
+          ≥ {{ result.normal_min }} {{ result.unit or '' }}
+        {% elif result.normal_max is not none %}
+          ≤ {{ result.normal_max }} {{ result.unit or '' }}
+        {% else %}
+          —
+        {% endif %}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">ค่าปัจจุบัน</span>
+      <span class="info-value {% if result.is_abnormal %}abnormal{% endif %}">
+        {{ result.value }}
+        {% if result.is_abnormal %}
+          <span class="abnormal-tag">⚠ ผิดปกติ</span>
+        {% else %}
+          <span class="normal-tag">✓ ปกติ</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">บันทึกเมื่อ</span>
+      <span class="info-value">{{ result.recorded_at.strftime('%d/%m/%Y %H:%M') if result.recorded_at else '—' }}</span>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('lab.edit_result', result_id=result.result_id) }}">
+    <div class="form-group">
+      <label class="form-label" for="value">ค่าใหม่ที่ต้องการแก้ไข <span class="required">*</span></label>
+      <div class="input-row">
+        <input
+          type="number"
+          step="any"
+          id="value"
+          name="value"
+          class="form-input"
+          value="{{ result.value }}"
+          required
+          autofocus
+        >
+        <span class="unit-label">{{ result.unit or '' }}</span>
+      </div>
+      {% if result.normal_min is not none and result.normal_max is not none %}
+      <p class="input-hint">ค่าปกติ: {{ result.normal_min }} – {{ result.normal_max }} {{ result.unit or '' }}</p>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('lab.order_detail', order_id=result.order_id) }}" class="btn btn-secondary">ยกเลิก</a>
+      <button type="submit" class="btn btn-primary">💾 บันทึกการแก้ไข</button>
+    </div>
+  </form>
+</div>
+
+<style>
+.edit-card { max-width:560px; margin:0 auto; }
+.edit-header { margin-bottom:20px; }
+.page-title  { font-size:1.4rem; font-weight:700; margin:0 0 4px; }
+.edit-sub    { color:#888; font-size:.875rem; margin:0; }
+
+.test-info-box { background:#f8f9fa; border-radius:10px; padding:16px 20px; margin-bottom:24px; }
+.info-row    { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #ececec; }
+.info-row:last-child { border:none; }
+.info-label  { color:#888; font-size:.85rem; }
+.info-value  { font-size:.9rem; text-align:right; }
+.info-value.bold { font-weight:700; }
+.info-value.abnormal { color:#c62828; font-weight:700; }
+
+.abnormal-tag { background:#fdecea; color:#c62828; font-size:.75rem; padding:2px 8px; border-radius:20px; margin-left:6px; }
+.normal-tag   { background:#e8f5e9; color:#2e7d32; font-size:.75rem; padding:2px 8px; border-radius:20px; margin-left:6px; }
+
+.form-group  { margin-bottom:20px; }
+.form-label  { display:block; font-weight:600; margin-bottom:8px; font-size:.9rem; }
+.required    { color:#e53935; }
+.input-row   { display:flex; align-items:center; gap:10px; }
+.form-input  { width:180px; padding:9px 12px; border:1.5px solid #ccc; border-radius:7px; font-size:1rem; }
+.form-input:focus { outline:none; border-color:#1a6fa8; box-shadow:0 0 0 3px rgba(26,111,168,.12); }
+.unit-label  { color:#666; font-size:.9rem; }
+.input-hint  { margin:6px 0 0; font-size:.8rem; color:#888; }
+
+.form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
+.btn { display:inline-block; padding:9px 22px; border-radius:7px; font-size:.9rem; font-weight:600; text-decoration:none; cursor:pointer; border:none; }
+.btn-primary   { background:#1a6fa8; color:#fff; }
+.btn-primary:hover { background:#155d8f; }
+.btn-secondary { background:#f0f0f0; color:#333; }
+.btn-secondary:hover { background:#e0e0e0; }
+</style>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('doctor.dashboard') }}" class="nav-tab active">ค้นหาผู้ป่วย</a>
+  <a href="{{ url_for('doctor.profile') }}"   class="nav-tab">โปรไฟล์</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>ค้นหาผู้ป่วย</h1>
+</div>
+
+<form method="GET" class="search-form">
+  <input type="text" name="q" value="{{ q }}" placeholder="ชื่อผู้ป่วย หรือ HN..." class="input-search" autofocus>
+  <button type="submit" class="btn btn-primary">ค้นหา</button>
+</form>
+
+{% if patients %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>HN</th><th>ชื่อ-นามสกุล</th><th>วันเกิด</th>
+        <th>หมู่เลือด</th><th>เบอร์โทร</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in patients %}
+      <tr>
+        <td class="mono">{{ p.HN }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.dob }}</td>
+        <td>{{ p.blood_type or '—' }}</td>
+        <td>{{ p.contact_phone or '—' }}</td>
+        <td>
+          <a href="{{ url_for('doctor.order_new', patient_id=p.patient_id) }}"
+             class="btn btn-primary btn-sm">สั่งตรวจ</a>
+          <a href="{{ url_for('doctor.results', patient_id=p.patient_id) }}"
+             class="btn btn-secondary btn-sm">ดูผล</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% elif q %}
+  <p class="empty">ไม่พบผู้ป่วยที่ค้นหา "{{ q }}"</p>
+{% else %}
+  <p class="empty">พิมพ์ชื่อหรือ HN เพื่อค้นหาผู้ป่วย</p>
+{% endif %}
+{% endblock %}

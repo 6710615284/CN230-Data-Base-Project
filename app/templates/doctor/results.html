@@ -1,0 +1,75 @@
+{% extends 'base.html' %} {% block title %}ผลตรวจ{% endblock %} {% block nav_links %}
+<a href="{{ url_for('doctor.dashboard') }}" class="nav-tab">ค้นหาผู้ป่วย</a> {% endblock %} {% block content %}
+<div class="page-header">
+    <h1>ผลตรวจ</h1>
+    <p class="sub">{{ patient.name }} <span class="mono">{{ patient.HN }}</span></p>
+</div>
+
+{% if not orders %}
+<p class="empty">ยังไม่มีใบสั่งตรวจ</p>
+{% endif %} {% for order in orders %}
+<div class="card {{ 'card-cancelled' if order.status == 'cancelled' else '' }}" style="margin-bottom:16px">
+    <div class="order-header">
+        <span class="mono">#{{ order.order_id }}</span>
+        <span class="badge badge-{{ order.status }}">{{ order.status }}</span>
+        <span class="badge badge-{{ order.priority }}">{{ order.priority }}</span>
+        <span class="order-date">{{ order.ordered_at.strftime('%d %b %Y %H:%M') }}</span>
+        <span class="order-doctor">{{ order.doctor_name }}</span> {% if order.status == 'pending' and order.doctor_id == session.staff_id | int %}
+        <form method="POST" action="{{ url_for('doctor.cancel_order', order_id=order.order_id) }}" style="margin-left:auto" onsubmit="return confirm('ยืนยันการยกเลิก Order #{{ order.order_id }}?')">
+            <button type="submit" class="btn btn-danger btn-sm">ยกเลิก</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if order.status == 'cancelled' %}
+    <div class="cancelled-notice">⚠ Order นี้ถูกยกเลิกแล้ว — ไม่มีการตรวจ</div>
+    {% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>รายการตรวจ</th>
+                <th>ผลลัพธ์</th>
+                <th>ค่าปกติ</th>
+                <th>หน่วย</th>
+                <th>สถานะ</th>
+                <th>วันที่บันทึก</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in grouped[order.order_id] %}
+            <tr class="{{ 'row-abnormal' if row.is_abnormal else '' }}">
+                <td>{{ row.test_name }}</td>
+                <td class="{{ 'val-abnormal' if row.is_abnormal else 'mono' }}">
+                    {{ row.value if row.value is not none else '—' }}
+                </td>
+                <td class="mono">{{ row.normal_min }}–{{ row.normal_max }}</td>
+                <td>{{ row.unit }}</td>
+                <td>
+                    {% if row.value is not none %}
+                    <span class="badge {{ 'badge-abnormal' if row.is_abnormal else 'badge-normal' }}">
+              {{ 'ผิดปกติ' if row.is_abnormal else 'ปกติ' }}
+            </span> {% else %}
+                    <span class="badge badge-pending">รอผล</span> {% endif %}
+                </td>
+                <td>{{ row.recorded_at.strftime('%d %b %Y') if row.recorded_at else '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endfor %}
+
+<style>
+    .card-cancelled {
+        opacity: 0.6;
+    }
+    
+    .cancelled-notice {
+        padding: 12px 16px;
+        color: #888;
+        font-size: .875rem;
+        font-style: italic;
+    }
+</style>
+{% endblock %}

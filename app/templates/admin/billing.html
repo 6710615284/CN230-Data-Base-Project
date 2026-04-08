@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}รายงานบิล{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('admin.patients') }}"  class="nav-tab">ผู้ป่วย</a>
+  <a href="{{ url_for('admin.staff') }}"     class="nav-tab">เจ้าหน้าที่</a>
+  <a href="{{ url_for('admin.testtypes') }}" class="nav-tab">ประเภทการตรวจ</a>
+  <a href="{{ url_for('admin.billing') }}"   class="nav-tab active">บิล</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>รายงานบิล</h1>
+  <p class="sub">สรุปยอดค่าใช้จ่ายรายผู้ป่วย</p>
+</div>
+
+<form method="GET" class="search-form" style="align-items:center">
+  <label style="font-size:13px;color:var(--text2);">ตั้งแต่</label>
+  <input type="date" name="date_from" value="{{ date_from }}" class="input" style="width:160px">
+  <label style="font-size:13px;color:var(--text2);">ถึง</label>
+  <input type="date" name="date_to"   value="{{ date_to }}"   class="input" style="width:160px">
+  <button class="btn btn-primary">กรอง</button>
+  {% if date_from or date_to %}
+  <a href="{{ url_for('admin.billing') }}" class="btn btn-secondary">ล้าง</a>
+  {% endif %}
+</form>
+
+{% if rows %}
+{% set grand = rows | sum(attribute='grand_total') %}
+<div class="card" style="padding:0;overflow:hidden;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>HN</th><th>ชื่อผู้ป่วย</th>
+        <th style="text-align:center">จำนวน Order</th>
+        <th style="text-align:right">ยอดรวม (บาท)</th>
+        <th style="width:80px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="mono">{{ r.HN }}</td>
+        <td>{{ r.name }}</td>
+        <td style="text-align:center">{{ r.order_count }}</td>
+        <td style="text-align:right;font-weight:500;">{{ '%.2f'|format(r.grand_total) }}</td>
+        <td>
+          <a href="{{ url_for('admin.billing_detail', patient_id=r.patient_id) }}"
+             class="btn btn-secondary btn-sm">ดูรายละเอียด</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr style="background:var(--bg);">
+        <td colspan="3" style="padding:10px 12px;font-weight:600;font-size:13px;">รวมทั้งหมด</td>
+        <td style="text-align:right;padding:10px 12px;font-weight:700;color:var(--blue);">
+          {{ '%.2f'|format(grand) }}
+        </td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% else %}
+  <p class="empty">ไม่พบข้อมูลบิลในช่วงที่เลือก</p>
+{% endif %}
+{% endblock %}

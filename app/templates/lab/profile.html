@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}โปรไฟล์{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('lab.dashboard') }}" class="nav-tab">คิวรอตรวจ</a>
+  <a href="{{ url_for('lab.profile') }}"   class="nav-tab active">โปรไฟล์</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>โปรไฟล์</h1></div>
+
+<div class="card" style="max-width:400px">
+  <table class="table-info">
+    <tr><td>ชื่อ</td><td>{{ session.name }}</td></tr>
+    <tr><td>Role</td><td>{{ session.role }}</td></tr>
+  </table>
+
+  <hr style="margin:16px 0;border-color:var(--border)">
+
+  <h3 style="margin-bottom:12px">เปลี่ยน Password</h3>
+  <form method="POST">
+    <div class="form-group">
+      <label>Password ใหม่</label>
+      <input type="password" name="new_password" class="input" required>
+    </div>
+    <div class="form-group" style="margin-top:10px">
+      <label>ยืนยัน Password</label>
+      <input type="password" name="confirm_password" class="input" required>
+    </div>
+    <div class="form-actions" style="margin-top:16px">
+      <button type="submit" class="btn btn-primary">บันทึก</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

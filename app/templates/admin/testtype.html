@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}ประเภทการตรวจ{% endblock %}
+
+{% block nav_links %}
+  <a href="{{ url_for('admin.patients') }}"  class="nav-tab">ผู้ป่วย</a>
+  <a href="{{ url_for('admin.staff') }}"     class="nav-tab">เจ้าหน้าที่</a>
+  <a href="{{ url_for('admin.testtypes') }}" class="nav-tab active">ประเภทการตรวจ</a>
+  <a href="{{ url_for('admin.billing') }}"   class="nav-tab">บิล</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
+  <div>
+    <h1>ประเภทการตรวจทั้งหมด</h1>
+    <p class="sub">กำหนดรายการตรวจ ค่าปกติ และราคา</p>
+  </div>
+  <a href="{{ url_for('admin.testtype_new') }}" class="btn btn-primary">+ เพิ่มประเภทการตรวจ</a>
+</div>
+
+{% if testtypes %}
+<div class="card" style="padding:0;overflow:hidden;">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ชื่อการตรวจ</th><th>หน่วย</th>
+        <th>ค่าปกติต่ำสุด</th><th>ค่าปกติสูงสุด</th>
+        <th>ราคา (บาท)</th><th style="width:100px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tt in testtypes %}
+      <tr>
+        <td>{{ tt.name }}</td>
+        <td>{{ tt.unit or '—' }}</td>
+        <td>{{ tt.normal_min or '—' }}</td>
+        <td>{{ tt.normal_max or '—' }}</td>
+        <td style="font-weight:500;">{{ '%.2f'|format(tt.price) }}</td>
+        <td>
+          <a href="{{ url_for('admin.testtype_edit', tid=tt.test_id) }}"
+             class="btn btn-secondary btn-sm">แก้ไข</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">ยังไม่มีประเภทการตรวจ</p>
+{% endif %}
+{% endblock %}

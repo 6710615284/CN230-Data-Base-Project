@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>HLIS - เข้าสู่ระบบ</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; margin-top: 100px; }
+        .box { width: 320px; }
+        input { width: 100%; padding: 8px; margin: 6px 0 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        .error { color: red; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>HLIS เข้าสู่ระบบ</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, msg in messages %}
+                <p class="error">{{ msg }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <label>Username</label>
+            <input type="text" name="username" required autofocus>
+            <label>Password</label>
+            <input type="password" name="password" required>
+            <button type="submit">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+</body>
+</html>
