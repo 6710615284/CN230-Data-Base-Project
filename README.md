@@ -1,4 +1,4 @@
-# CN230 HLIS Project
+#CN230 HLIS Project
 
 Hospital Laboratory Information System (HLIS) สำหรับรายวิชาระบบฐานข้อมูล วพ.230 พัฒนาเป็นเว็บแอปด้วย `Flask` + `MySQL` เพื่อรองรับ workflow หลักของห้องปฏิบัติการในโรงพยาบาล โดยแยกสิทธิ์ตามบทบาท `doctor`, `lab` และ `admin`
 
