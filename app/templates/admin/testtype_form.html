@@ -15,7 +15,10 @@
 </div>
 
 <div class="card" style="max-width:720px;">
-  <form method="POST">
+  <form
+    method="POST"
+    action="{{ popup_url('admin.testtype_new') if action == 'new' else popup_url('admin.testtype_edit', tid=tt.test_id) }}"
+  >
     <div class="form-group">
       <label>ชื่อการตรวจ</label>
       <input class="input" name="name" value="{{ tt.name or '' }}" required placeholder="เช่น CBC, Blood Sugar">
@@ -44,7 +47,11 @@
     </div>
 
     <div class="form-actions">
-      <a href="{{ url_for('admin.testtypes') }}" class="btn btn-secondary">ยกเลิก</a>
+      <a
+        href="{{ popup_url('admin.testtypes') }}"
+        class="btn btn-secondary"
+        {% if popup_mode %}data-popup-close{% endif %}
+      >ยกเลิก</a>
       <button type="submit" class="btn btn-primary">
         {{ 'เพิ่มประเภทการตรวจ' if action=='new' else 'บันทึกการแก้ไข' }}
       </button>

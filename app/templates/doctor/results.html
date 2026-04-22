@@ -15,6 +15,13 @@
   </p>
 </div>
 
+{% if popup_mode %}
+<div class="toolbar" style="margin-bottom:16px;">
+  <div></div>
+  <a href="{{ popup_url('doctor.dashboard') }}" class="btn btn-secondary" data-popup-close>ปิดหน้าต่าง</a>
+</div>
+{% endif %}
+
 {% if not orders %}
 <div class="card">
   <p class="empty">ยังไม่มีใบสั่งตรวจสำหรับผู้ป่วยรายนี้</p>
@@ -35,7 +42,7 @@
     {% if order.status == 'pending' and order.doctor_id == session.staff_id | int %}
     <form
       method="POST"
-      action="{{ url_for('doctor.cancel_order', order_id=order.order_id) }}"
+      action="{{ popup_url('doctor.cancel_order', order_id=order.order_id) }}"
       style="margin-left:auto;"
       onsubmit="return confirm('ยืนยันการยกเลิก Order #{{ order.order_id }} ?')"
     >

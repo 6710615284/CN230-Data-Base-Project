@@ -24,7 +24,12 @@
       {% endif %}
     </form>
 
-    <a href="{{ url_for('admin.patient_new') }}" class="btn btn-primary">+ เพิ่มผู้ป่วย</a>
+    <a
+      href="{{ url_for('admin.patient_new') }}"
+      class="btn btn-primary"
+      data-page-modal
+      data-modal-title="เพิ่มผู้ป่วย"
+    >+ เพิ่มผู้ป่วย</a>
   </div>
 
   {% if patients %}
@@ -49,12 +54,20 @@
           <td>{{ p.blood_type or '—' }}</td>
           <td>{{ p.contact_phone or '—' }}</td>
           <td>
-            <a href="{{ url_for('admin.patient_edit', pid=p.patient_id) }}" class="btn btn-secondary btn-sm">แก้ไข</a>
+            <a
+              href="{{ url_for('admin.patient_edit', pid=p.patient_id) }}"
+              class="btn btn-secondary btn-sm"
+              data-page-modal
+              data-modal-title="แก้ไขข้อมูลผู้ป่วย"
+            >แก้ไข</a>
             <form
               method="POST"
               action="{{ url_for('admin.patient_delete', pid=p.patient_id) }}"
               style="display:inline;"
-              onsubmit="return confirm('ลบผู้ป่วย {{ p.name }} ใช่ไหม?')"
+              data-confirm-modal
+              data-confirm-title="ยืนยันการลบผู้ป่วย"
+              data-confirm-message="ลบผู้ป่วย {{ p.name }} ใช่หรือไม่?"
+              data-confirm-button="ลบผู้ป่วย"
             >
               <button class="btn btn-danger btn-sm">ลบ</button>
             </form>

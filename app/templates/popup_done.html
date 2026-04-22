@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HLIS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="popup-body">
+  <div class="popup-done">
+    <div class="card popup-done-card">
+      <div class="section-title">บันทึกข้อมูลเรียบร้อย</div>
+      <div class="section-sub">กำลังอัปเดตหน้าหลักให้คุณ</div>
+      <div class="form-actions" style="justify-content:center;">
+        <a href="{{ parent_url or '#' }}" class="btn btn-primary">กลับไปหน้าหลัก</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'hlis-popup-done',
+        refreshParent: {{ 'true' if refresh_parent else 'false' }},
+        parentUrl: {{ parent_url|tojson }}
+      }, window.location.origin);
+    }
+  })();
+  </script>
+</body>
+</html>

@@ -32,7 +32,7 @@
   </table>
 </div>
 
-<form method="POST" action="{{ url_for('lab.order_detail', order_id=order.order_id) }}">
+<form method="POST" action="{{ popup_url('lab.order_detail', order_id=order.order_id) }}">
   <div class="table-shell">
     <table class="table">
       <thead>
@@ -91,7 +91,7 @@
               <div style="font-size:12px;color:var(--text-faint);">
                 {{ item.recorded_at.strftime('%H:%M') if item.recorded_at else '' }}
               </div>
-              <a href="{{ url_for('lab.edit_result', result_id=item.result_id) }}" class="btn btn-secondary btn-sm" style="margin-top:6px;">แก้ไข</a>
+              <a href="{{ popup_url('lab.edit_result', result_id=item.result_id) }}" class="btn btn-secondary btn-sm" style="margin-top:6px;">แก้ไข</a>
             {% else %}
               —
             {% endif %}
@@ -105,7 +105,11 @@
   {% set has_pending = items | selectattr('item_status', 'eq', 'pending') | list %}
   {% if has_pending %}
   <div class="form-actions">
-    <a href="{{ url_for('lab.dashboard') }}" class="btn btn-secondary">ยกเลิก</a>
+    <a
+      href="{{ popup_url('lab.dashboard') }}"
+      class="btn btn-secondary"
+      {% if popup_mode %}data-popup-close{% endif %}
+    >ยกเลิก</a>
     <button type="submit" class="btn btn-primary">บันทึกผลตรวจ</button>
   </div>
   {% else %}

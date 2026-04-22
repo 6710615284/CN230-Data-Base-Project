@@ -1,10 +1,12 @@
 USE hlis;
--- Default password for seed accounts: <username>@hlis2026
-INSERT INTO Staff (name, role, username, password_hash) VALUES ('นพ.สมชาย ใจดี', 'doctor', 'doctor1', 'scrypt:32768:8:1$t73eCdQAoYfg3kLp$3020b4d68feceeccd9eb47ce68ef69df9ccfced3e9377440c020ce0c51070646be9af046f7a575fb30270965da36285bc42c894e5f2522d42f8ab147d61f88ad');
-INSERT INTO Staff (name, role, username, password_hash) VALUES ('นพ.วิภา รักษาดี', 'doctor', 'doctor2', 'scrypt:32768:8:1$8VuLoTOUM3xfVIyQ$23ad3f115546c9f415459427065a331eef86a351077e535217da4a214d36bbc8096e0ee0fc98bb26c839e413963019fea3d94cace04e30cb06ef1d569a9a8be1');
-INSERT INTO Staff (name, role, username, password_hash) VALUES ('นักเทคนิค สมใจ', 'lab', 'lab1', 'scrypt:32768:8:1$5DxIn6CJ0YccYsv7$a3c94c67529e02e543b23d673a05e492129edf7bd988db7049a6b86a61d7a7b479edd7d25f201e787fce5e086d6e2bf7627d627af40a43a26c5237cdec66d3f0');
-INSERT INTO Staff (name, role, username, password_hash) VALUES ('นักเทคนิค มานะ', 'lab', 'lab2', 'scrypt:32768:8:1$rVwUJINWKSTbYnOz$98c4881bbcac886edba971365501a34594eb739416e092a4ff6495705e6931ff48bd95cde1dd086d7680b75a577a1dbb9eabbfe32aa9b3b35807c185e8e0ac22');
-INSERT INTO Staff (name, role, username, password_hash) VALUES ('ผู้ดูแลระบบ', 'admin', 'admin1', 'scrypt:32768:8:1$kY3xb7SjkctkEGHX$61bfad94da02431c08ec51d6c4c326560865afaa35c9857cecb6488ff41bef43c6ee0bd34ab271b6a3cdae2cd6ff252316b4c676e5be53911df6ca78eedfd042');
+
+-- Staff (5 คน)
+INSERT INTO Staff (name, role, username, password_hash) VALUES 
+('นพ.สมชาย ใจดี', 'doctor', 'doc0001', 'นพ.สมชาย ใจดี', 'doctor', 'doc0001', 'scrypt:32768:8:1$tzVVzF1jMpoc1Mv0$4041cc1fd2249f8f34fa135a44cc2cd1c925c8ac614281f16ee8a367d73b831ab105d465e1c0b580bd4ac2789d5dbab9940410920c8012a7535808330aeec549'),
+('นพ.วิภา รักษาดี', 'doctor', 'doc0002', 'นพ.วิภา รักษาดี', 'doctor', 'doc0002', 'scrypt:32768:8:1$sb90p16lHoTEEqjx$6a34ea75fc2e08f5350f6cd89c18e8aaf810e30e941db7e718f7e98d641f02ff1ad4e9d855d248c79e93a696900325782b60e3586123552c99779094d0107104'),
+('นักเทคนิค สมใจ', 'lab',    'lab0003', 'นักเทคนิค สมใจ', 'lab',    'lab0003', 'scrypt:32768:8:1$qt0zn8Tm5ZU57Pyp$92f0b971a0507e9ec8a625462a8981c29345a261820a007086dc5b484eb4bf3245edf9a8950a8eb529623095d6197c063decd4097d24f804b186205b4acf2e7d'),
+('นักเทคนิค มานะ', 'lab',    'lab0004', 'นักเทคนิค มานะ', 'lab',    'lab0004', 'scrypt:32768:8:1$B0IqTPRt0881PzBG$253c553c15a4b8cd54a9d57618fc77c343d2a59ef32309ee16c4efb61b15331282ca7cd742b42f4d7c927a7a09e581477e19a83aa609bf021fcbd26ebb621884'),
+('ผู้ดูแลระบบ',     'admin',  'adm0005', 'ผู้ดูแลระบบ',     'admin',  'adm0005', 'scrypt:32768:8:1$xTv04Ual13PdyGKr$4232b892e28fc9d920353499eea9619d580eeb16b5cec1e2f8069266107c7a3d0af099d22a79c9bbca056e4f86bbdb107b8740fb77b311f2a9931cf71dcece3b');
 
 -- Patient (5 คน)
 INSERT INTO Patient (HN, name, dob, blood_type, contact_phone) VALUES
@@ -25,7 +27,7 @@ INSERT INTO Test_Type (name, unit, normal_min, normal_max, price) VALUES
 ('Hemoglobin',                 'g/dL',     12.0,   17.5,  150.00);
 
 -- Lab_Order
--- doctor1 = staff_id 1, doctor2 = staff_id 2
+-- doc0001 = staff_id 1, doc0002 = staff_id 2
 INSERT INTO Lab_Order (patient_id, doctor_id, ordered_at, status, priority) VALUES
 (1, 1, NOW() - INTERVAL 2 DAY, 'completed', 'routine'),  -- order_id 1
 (2, 1, NOW() - INTERVAL 1 DAY, 'completed', 'urgent'),   -- order_id 2
@@ -56,7 +58,6 @@ INSERT INTO Billing (order_item_id, unit_price, discount, total) VALUES
 (8, 250.00,  0, 250.00);
 
 -- Lab_Result (เฉพาะ item ที่ completed แล้ว)
--- recorded_by = lab1 = staff_id 3
 INSERT INTO Lab_Result (order_item_id, value, recorded_by, recorded_at, is_abnormal) VALUES
 (1, 8500, 3, NOW() - INTERVAL 2 DAY, FALSE),  -- CBC ปกติ (4000-11000)
 (2,  130, 3, NOW() - INTERVAL 2 DAY, TRUE),   -- Glucose สูง! (>100)

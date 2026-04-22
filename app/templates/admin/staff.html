@@ -37,7 +37,12 @@
       <div class="section-title" style="margin-bottom:4px;">รายชื่อเจ้าหน้าที่</div>
       <div class="section-sub" style="margin-bottom:0;">จำนวนทั้งหมด {{ staff_list|length if staff_list else 0 }} รายการ</div>
     </div>
-    <a href="{{ url_for('admin.staff_new') }}" class="btn btn-primary">+ เพิ่มเจ้าหน้าที่</a>
+    <a
+      href="{{ url_for('admin.staff_new') }}"
+      class="btn btn-primary"
+      data-page-modal
+      data-modal-title="เพิ่มเจ้าหน้าที่"
+    >+ เพิ่มเจ้าหน้าที่</a>
   </div>
 
   {% if staff_list %}
@@ -60,10 +65,23 @@
           <td class="mono">{{ s.username }}</td>
           <td><span class="badge role-{{ s.role }}">{{ s.role }}</span></td>
           <td>
-            <a href="{{ url_for('admin.staff_edit', sid=s.staff_id) }}" class="btn btn-secondary btn-sm">แก้ไข</a>
+            <a
+              href="{{ url_for('admin.staff_edit', sid=s.staff_id) }}"
+              class="btn btn-secondary btn-sm"
+              data-page-modal
+              data-modal-title="แก้ไขข้อมูลเจ้าหน้าที่"
+            >แก้ไข</a>
             <button type="button" class="btn btn-secondary btn-sm" onclick="openPwModal({{ s.staff_id }})">รีเซ็ต PW</button>
-            <form method="POST" action="{{ url_for('admin.staff_delete', sid=s.staff_id) }}" style="display:inline;">
-              <button class="btn btn-danger btn-sm" onclick="return confirm('ยืนยันการลบ?')">ลบ</button>
+            <form
+              method="POST"
+              action="{{ url_for('admin.staff_delete', sid=s.staff_id) }}"
+              style="display:inline;"
+              data-confirm-modal
+              data-confirm-title="ยืนยันการลบเจ้าหน้าที่"
+              data-confirm-message="ลบบัญชีของ {{ s.name }} ใช่หรือไม่?"
+              data-confirm-button="ลบเจ้าหน้าที่"
+            >
+              <button class="btn btn-danger btn-sm">ลบ</button>
             </form>
           </td>
         </tr>

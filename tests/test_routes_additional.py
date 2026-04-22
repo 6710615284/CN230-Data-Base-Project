@@ -2,19 +2,10 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 
-from app import create_app
+from tests.web_test_case import WebAppTestCase
 
 
-class AdditionalRouteTests(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app()
-        self.app.config.update(TESTING=True, SECRET_KEY="test-secret-key")
-        self.client = self.app.test_client()
-
-    def set_session(self, **values):
-        with self.client.session_transaction() as session:
-            for key, value in values.items():
-                session[key] = value
+class AdditionalRouteTests(WebAppTestCase):
 
     def test_doctor_results_renders_patient_orders(self):
         patient = {"patient_id": 1, "HN": "HN-00001", "name": "Alice"}
@@ -51,6 +42,50 @@ class AdditionalRouteTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("Alice", response.get_data(as_text=True))
+        get_results_mock.assert_called_once_with(1)
+
+    @patch(
+        "app.routes.doctor.doctor_service.get_patient_results",
+        return_value=(None, [], {}),
+    )
+    def test_doctor_results_redirects_when_patient_is_missing(self, get_results_mock):
+        self.set_session(staff_id=7, name="Doctor", role="doctor")
+
+        response = self.client.get("/doctor/results/999")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.headers["Location"].endswith("/doctor/dashboard"))
+        get_results_mock.assert_called_once_with(999)
+
+    @patch(
+        "app.routes.doctor.doctor_service.get_patient_results",
+        return_value=(
+            {"patient_id": 1, "HN": "HN-00001", "name": "Alice"},
+            [
+                {
+                    "order_id": 11,
+                    "status": "pending",
+                    "priority": "routine",
+                    "ordered_at": datetime(2026, 4, 8, 9, 30),
+                    "doctor_name": "Dr. House",
+                    "doctor_id": 7,
+                }
+            ],
+            {11: []},
+        ),
+    )
+    def test_doctor_results_popup_uses_popup_action_for_cancel_form(
+        self, get_results_mock
+    ):
+        self.set_session(staff_id=7, name="Doctor", role="doctor")
+
+        response = self.client.get("/doctor/results/1?popup=1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            '/doctor/order/cancel/11?popup=1',
+            response.get_data(as_text=True),
+        )
         get_results_mock.assert_called_once_with(1)
 
     @patch("app.routes.doctor.doctor_service.cancel_order", return_value=9)
@@ -421,7 +456,7 @@ class AdditionalRouteTests(unittest.TestCase):
         self.assertIn("Jane", response.get_data(as_text=True))
         get_staff_mock.assert_called_once_with()
 
-    @patch("app.routes.admin.admin_service.create_staff", return_value=("lab3", "lab3@hlis2026"))
+    @patch("app.routes.admin.admin_service.create_staff", return_value=("lab0003", "Hlis0003"))
     def test_admin_staff_new_redirects_on_success(self, create_staff_mock):
         self.set_session(staff_id=99, name="Admin", role="admin")
 
@@ -550,6 +585,38 @@ class AdditionalRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.headers["Location"].endswith("/admin/billing"))
         get_detail_mock.assert_called_once_with(88)
+
+    @patch(
+        "app.routes.admin.admin_service.get_billing_detail",
+        return_value=(
+            {"patient_id": 1, "HN": "HN-00001", "name": "Alice"},
+            [
+                {
+                    "order_id": 12,
+                    "ordered_at": datetime(2026, 4, 8, 9, 30),
+                    "status": "pending",
+                    "priority": "urgent",
+                    "test_name": "CBC",
+                    "unit_price": 100.0,
+                    "discount": 0.0,
+                    "total": 100.0,
+                }
+            ],
+        ),
+    )
+    def test_admin_billing_detail_popup_uses_popup_action_for_cancel_form(
+        self, get_detail_mock
+    ):
+        self.set_session(staff_id=99, name="Admin", role="admin")
+
+        response = self.client.get("/admin/billing/1?popup=1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            '/admin/order/cancel/12?popup=1',
+            response.get_data(as_text=True),
+        )
+        get_detail_mock.assert_called_once_with(1)
 
     @patch("app.routes.admin.admin_service.cancel_order", return_value=(True, 5))
     def test_admin_order_cancel_redirects_to_billing_detail_on_success(self, cancel_mock):

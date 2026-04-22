@@ -6,7 +6,8 @@
   <title>HLIS — {% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body class="{{ 'popup-body' if popup_mode else '' }}">
+  {% if not popup_mode %}
   <nav class="navbar">
     <div class="nav-brand">
       <div class="brand-title">HLIS</div>
@@ -23,8 +24,9 @@
       <a href="{{ url_for('auth.logout') }}" class="btn-logout">ออกจากระบบ</a>
     </div>
   </nav>
+  {% endif %}
 
-  <div class="container">
+  <div class="container {{ 'container-popup' if popup_mode else '' }}">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% for cat, msg in messages %}
         <div class="flash flash-{{ cat }}">{{ msg }}</div>
@@ -33,5 +35,163 @@
 
     {% block content %}{% endblock %}
   </div>
+
+  {% if not popup_mode %}
+  <div id="confirm-modal" class="confirm-modal-shell" hidden>
+    <div class="confirm-modal-card card">
+      <div class="section-title" id="confirm-modal-title">ยืนยันการลบ</div>
+      <div class="section-sub" id="confirm-modal-message">ต้องการดำเนินการต่อใช่หรือไม่?</div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" id="confirm-modal-cancel">ยกเลิก</button>
+        <button type="button" class="btn btn-danger" id="confirm-modal-submit">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-modal" class="page-modal" hidden>
+    <div class="page-modal-dialog">
+      <div class="page-modal-bar">
+        <div class="page-modal-title" id="page-modal-title">รายละเอียด</div>
+        <button type="button" class="btn btn-secondary btn-sm" id="page-modal-close">ปิด</button>
+      </div>
+      <iframe id="page-modal-frame" class="page-modal-frame" title="Popup Content"></iframe>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmTitle = document.getElementById('confirm-modal-title');
+    const confirmMessage = document.getElementById('confirm-modal-message');
+    const confirmCancel = document.getElementById('confirm-modal-cancel');
+    const confirmSubmit = document.getElementById('confirm-modal-submit');
+    let pendingForm = null;
+
+    const modal = document.getElementById('page-modal');
+    const frame = document.getElementById('page-modal-frame');
+    const title = document.getElementById('page-modal-title');
+    const closeBtn = document.getElementById('page-modal-close');
+
+    function openConfirmModal(form) {
+      pendingForm = form;
+      confirmTitle.textContent = form.dataset.confirmTitle || 'ยืนยันการลบ';
+      confirmMessage.textContent = form.dataset.confirmMessage || 'ต้องการดำเนินการต่อใช่หรือไม่?';
+      confirmSubmit.textContent = form.dataset.confirmButton || 'ยืนยัน';
+      confirmModal.hidden = false;
+      document.body.classList.add('modal-open');
+    }
+
+    function closeConfirmModal() {
+      confirmModal.hidden = true;
+      pendingForm = null;
+      if (modal.hidden) {
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    function withPopupParam(url) {
+      const parsed = new URL(url, window.location.origin);
+      parsed.searchParams.set('popup', '1');
+      return parsed.toString();
+    }
+
+    function openPageModal(url, text) {
+      title.textContent = text || 'รายละเอียด';
+      frame.src = withPopupParam(url);
+      modal.hidden = false;
+      document.body.classList.add('modal-open');
+    }
+
+    function closePageModal(options) {
+      const next = options || {};
+      modal.hidden = true;
+      frame.src = 'about:blank';
+      document.body.classList.remove('modal-open');
+
+      if (next.parentUrl) {
+        window.location.assign(next.parentUrl);
+        return;
+      }
+
+      if (next.refreshParent) {
+        window.location.reload();
+      }
+    }
+
+    closeBtn.addEventListener('click', function () {
+      closePageModal();
+    });
+
+    confirmCancel.addEventListener('click', function () {
+      closeConfirmModal();
+    });
+
+    confirmSubmit.addEventListener('click', function () {
+      const form = pendingForm;
+      closeConfirmModal();
+      if (form) {
+        HTMLFormElement.prototype.submit.call(form);
+      }
+    });
+
+    confirmModal.addEventListener('click', function (event) {
+      if (event.target === confirmModal) closeConfirmModal();
+    });
+
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal) closePageModal();
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      if (!confirmModal.hidden) closeConfirmModal();
+      else if (!modal.hidden) closePageModal();
+    });
+
+    document.addEventListener('click', function (event) {
+      const trigger = event.target.closest('a[data-page-modal]');
+      if (!trigger) return;
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      event.preventDefault();
+      openPageModal(trigger.href, trigger.dataset.modalTitle || trigger.textContent.trim());
+    });
+
+    document.addEventListener('submit', function (event) {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-confirm-modal')) return;
+      event.preventDefault();
+      openConfirmModal(form);
+    });
+
+    window.addEventListener('message', function (event) {
+      if (event.origin !== window.location.origin) return;
+      if (!event.data || event.data.type !== 'hlis-popup-done') return;
+
+      closePageModal({
+        refreshParent: !!event.data.refreshParent,
+        parentUrl: event.data.parentUrl || null
+      });
+    });
+  })();
+  </script>
+  {% else %}
+  <script>
+  (function () {
+    function closePopup() {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'hlis-popup-done' }, window.location.origin);
+      }
+    }
+
+    document.addEventListener('click', function (event) {
+      const trigger = event.target.closest('[data-popup-close]');
+      if (!trigger) return;
+      event.preventDefault();
+      closePopup();
+    });
+  })();
+  </script>
+  {% endif %}
 </body>
 </html>

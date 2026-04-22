@@ -1,25 +1,18 @@
 import unittest
 from unittest.mock import patch
 
-from app import create_app
+from tests.web_test_case import WebAppTestCase
 
 
-class RouteTests(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app()
-        self.app.config.update(TESTING=True, SECRET_KEY="test-secret-key")
-        self.client = self.app.test_client()
-
-    def set_session(self, **values):
-        with self.client.session_transaction() as session:
-            for key, value in values.items():
-                session[key] = value
+class RouteTests(WebAppTestCase):
 
     def test_login_page_loads(self):
         response = self.client.get("/login")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("HLIS เข้าสู่ระบบ", response.get_data(as_text=True))
+        body = response.get_data(as_text=True)
+        self.assertIn("HLIS", body)
+        self.assertIn("เข้าสู่ระบบ", body)
 
     @patch("app.routes.auth.auth_service.login")
     def test_login_success_redirects_doctor_and_sets_session(self, login_mock):
@@ -159,4 +152,3 @@ class RouteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

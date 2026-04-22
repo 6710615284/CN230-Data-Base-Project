@@ -130,8 +130,18 @@
         <td>{{ p.blood_type or '—' }}</td>
         <td>{{ p.contact_phone or '—' }}</td>
         <td>
-          <a href="{{ url_for('doctor.order_new', patient_id=p.patient_id) }}" class="btn btn-primary btn-sm">สั่งตรวจ</a>
-          <a href="{{ url_for('doctor.results', patient_id=p.patient_id) }}" class="btn btn-secondary btn-sm">ดูผล</a>
+          <a
+            href="{{ url_for('doctor.order_new', patient_id=p.patient_id) }}"
+            class="btn btn-primary btn-sm"
+            data-page-modal
+            data-modal-title="สั่งตรวจ"
+          >สั่งตรวจ</a>
+          <a
+            href="{{ url_for('doctor.results', patient_id=p.patient_id) }}"
+            class="btn btn-secondary btn-sm"
+            data-page-modal
+            data-modal-title="ดูผลตรวจ"
+          >ดูผล</a>
         </td>
       </tr>
       {% endfor %}

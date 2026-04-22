@@ -1,5 +1,6 @@
 from flask import Blueprint, session, redirect, url_for, render_template, request, flash
 from app.auth import role_required
+from app.popup import is_popup_request, popup_done, popup_redirect
 from app.services import admin_service
 from app.validators import (
     ValidationError,
@@ -45,6 +46,8 @@ def patient_new():
             data["contact_phone"],
         )
         flash(f"เพิ่มผู้ป่วยสำเร็จ (HN: {hn})", "success")
+        if is_popup_request():
+            return popup_done(refresh_parent=True)
         return redirect(url_for("admin.patients"))
 
     return render_template("admin/patient_form.html", patient={}, action="new")
@@ -60,16 +63,17 @@ def patient_edit(pid):
 
     if request.method == "POST":
         try:
-            data = validate_patient_form(request.form, include_hn=True)
+            data = validate_patient_form(request.form)
         except ValidationError as error:
             flash(str(error), "error")
+            form_patient = {**patient, **request.form.to_dict()}
             return render_template(
-                "admin/patient_form.html", patient=patient, action="edit"
+                "admin/patient_form.html", patient=form_patient, action="edit"
             )
 
         err = admin_service.update_patient(
             pid,
-            data["HN"],
+            patient["HN"],
             data["name"],
             data["dob"],
             data["blood_type"],
@@ -77,11 +81,14 @@ def patient_edit(pid):
         )
         if err:
             flash(err, "error")
+            form_patient = {**patient, **request.form.to_dict()}
             return render_template(
-                "admin/patient_form.html", patient=patient, action="edit"
+                "admin/patient_form.html", patient=form_patient, action="edit"
             )
 
         flash("แก้ไขข้อมูลผู้ป่วยสำเร็จ", "success")
+        if is_popup_request():
+            return popup_done(refresh_parent=True)
         return redirect(url_for("admin.patients"))
 
     return render_template("admin/patient_form.html", patient=patient, action="edit")
@@ -118,6 +125,8 @@ def staff_new():
             flash(
                 f"เพิ่มเจ้าหน้าที่สำเร็จ (username: {username}, password: {raw_pw})", "success"
             )
+            if is_popup_request():
+                return popup_done(refresh_parent=True)
             return redirect(url_for("admin.staff"))
         except ValueError as e:
             flash(str(e), "error")
@@ -141,6 +150,8 @@ def staff_edit(sid):
             return render_template("admin/staff_form.html", staff=s, action="edit")
         admin_service.update_staff(sid, data["name"], data["role"])
         flash("แก้ไขข้อมูลเจ้าหน้าที่สำเร็จ", "success")
+        if is_popup_request():
+            return popup_done(refresh_parent=True)
         return redirect(url_for("admin.staff"))
 
     return render_template("admin/staff_form.html", staff=s, action="edit")
@@ -195,6 +206,8 @@ def testtype_new():
             data["price"],
         )
         flash("เพิ่มประเภทการตรวจสำเร็จ", "success")
+        if is_popup_request():
+            return popup_done(refresh_parent=True)
         return redirect(url_for("admin.testtypes"))
     return render_template("admin/testtype_form.html", tt={}, action="new")
 
@@ -218,6 +231,8 @@ def testtype_edit(tid):
             test_id=tid,
         )
         flash("แก้ไขประเภทการตรวจสำเร็จ", "success")
+        if is_popup_request():
+            return popup_done(refresh_parent=True)
         return redirect(url_for("admin.testtypes"))
 
     tt = admin_service.get_test_type(tid)
@@ -245,7 +260,7 @@ def billing_detail(patient_id):
     patient, items = admin_service.get_billing_detail(patient_id)
     if not patient:
         flash("ไม่พบผู้ป่วย", "error")
-        return redirect(url_for("admin.billing"))
+        return popup_redirect("admin.billing")
     return render_template("admin/billing_detail.html", patient=patient, items=items)
 
 
@@ -256,7 +271,7 @@ def order_cancel(order_id):
     ok, result = admin_service.cancel_order(order_id)
     if ok:
         flash(f"ยกเลิก Order #{order_id} สำเร็จ", "success")
-        return redirect(url_for("admin.billing_detail", patient_id=result))
+        return popup_redirect("admin.billing_detail", patient_id=result)
     else:
         flash(result, "error")
-        return redirect(url_for("admin.billing"))
+        return popup_redirect("admin.billing")

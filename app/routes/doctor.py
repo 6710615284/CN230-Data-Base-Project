@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.auth import role_required
+from app.popup import popup_redirect
 from app.services import doctor_service
 from app.validators import ValidationError, validate_order_tests, validate_password_change
 
@@ -22,7 +23,7 @@ def order_new(patient_id):
     patient = doctor_service.get_patient(patient_id)
     if not patient:
         flash("ไม่พบผู้ป่วย", "error")
-        return redirect(url_for("doctor.dashboard"))
+        return popup_redirect("doctor.dashboard")
 
     test_types = doctor_service.get_test_types()
 
@@ -41,7 +42,7 @@ def order_new(patient_id):
             patient_id, session["staff_id"], priority, selected
         )
         flash(f"สั่งตรวจเรียบร้อย — Order #{order_id}", "success")
-        return redirect(url_for("doctor.results", patient_id=patient_id))
+        return popup_redirect("doctor.results", patient_id=patient_id)
 
     return render_template(
         "doctor/order_form.html", patient=patient, test_types=test_types
@@ -53,6 +54,9 @@ def order_new(patient_id):
 @role_required("doctor")
 def results(patient_id):
     patient, orders, grouped = doctor_service.get_patient_results(patient_id)
+    if not patient:
+        flash("ไม่พบผู้ป่วย", "error")
+        return popup_redirect("doctor.dashboard")
     return render_template(
         "doctor/results.html", patient=patient, orders=orders, grouped=grouped
     )
@@ -66,10 +70,10 @@ def cancel_order(order_id):
 
     if patient_id:
         flash(f"ยกเลิก Order #{order_id} เรียบร้อย", "success")
-        return redirect(url_for("doctor.results", patient_id=patient_id))
+        return popup_redirect("doctor.results", patient_id=patient_id)
     else:
         flash("ไม่สามารถยกเลิกได้ — order ไม่พบ หรือไม่ใช่ของคุณ", "error")
-        return redirect(url_for("doctor.dashboard"))
+        return popup_redirect("doctor.dashboard")
 
 
 # ─── Profile ─────────────────────────────────────────────

@@ -15,7 +15,10 @@
 </div>
 
 <div class="card" style="max-width:640px;">
-  <form method="POST">
+  <form
+    method="POST"
+    action="{{ popup_url('admin.staff_new') if action == 'new' else popup_url('admin.staff_edit', sid=staff.staff_id) }}"
+  >
     <div class="form-group">
       <label>ชื่อ-นามสกุล</label>
       <input class="input" name="name" value="{{ staff.name or '' }}" required>
@@ -34,7 +37,7 @@
     {% if action == 'new' %}
     <div class="card" style="margin-top:16px; background:#f7fcfd; box-shadow:none;">
       <div class="section-sub" style="margin-bottom:0;">
-        ระบบจะสร้าง Username และ Password อัตโนมัติหลังจากเพิ่มเจ้าหน้าที่เรียบร้อย
+        ระบบจะสร้าง Username และ Password อัตโนมัติในรูปแบบ doc/lab/adm + รหัส 4 หลัก เช่น doc0001 และ Hlis0001
       </div>
     </div>
     {% else %}
@@ -45,7 +48,11 @@
     {% endif %}
 
     <div class="form-actions">
-      <a href="{{ url_for('admin.staff') }}" class="btn btn-secondary">ยกเลิก</a>
+      <a
+        href="{{ popup_url('admin.staff') }}"
+        class="btn btn-secondary"
+        {% if popup_mode %}data-popup-close{% endif %}
+      >ยกเลิก</a>
       <button type="submit" class="btn btn-primary">
         {{ 'เพิ่มเจ้าหน้าที่' if action=='new' else 'บันทึกการแก้ไข' }}
       </button>

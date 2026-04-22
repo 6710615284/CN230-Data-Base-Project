@@ -23,7 +23,11 @@
       <div class="section-title" style="margin-bottom:4px;">สรุปผู้ป่วย</div>
       <div class="section-sub" style="margin-bottom:0;">รายละเอียดค่าใช้จ่ายแยกตามรายการตรวจ</div>
     </div>
-    <a href="{{ url_for('admin.billing') }}" class="btn btn-secondary">← กลับ</a>
+    <a
+      href="{{ popup_url('admin.billing') }}"
+      class="btn btn-secondary"
+      {% if popup_mode %}data-popup-close{% endif %}
+    >← กลับ</a>
   </div>
 
   <table class="table-info">
@@ -69,7 +73,7 @@
           {% if item.status == 'pending' %}
           <form
             method="POST"
-            action="{{ url_for('admin.order_cancel', order_id=item.order_id) }}"
+            action="{{ popup_url('admin.order_cancel', order_id=item.order_id) }}"
             onsubmit="return confirm('ยกเลิก Order #{{ item.order_id }} ใช่ไหม?')"
           >
             <button class="btn btn-danger btn-sm">ยกเลิก</button>

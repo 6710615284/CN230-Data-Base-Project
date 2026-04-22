@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.auth import role_required
+from app.popup import is_popup_request, popup_done, popup_redirect
 from app.services import lab_service
 from app.validators import ValidationError, validate_password_change
 
@@ -21,7 +22,7 @@ def order_detail(order_id):
     order, items = lab_service.get_order_with_items(order_id)
     if not order:
         flash('ไม่พบ Order นี้', 'error')
-        return redirect(url_for('lab.dashboard'))
+        return popup_redirect('lab.dashboard')
 
     if request.method == 'POST':
         errors, saved = lab_service.save_results(
@@ -34,6 +35,8 @@ def order_detail(order_id):
             flash('กรุณากรอกค่าอย่างน้อย 1 รายการ', 'error')
         else:
             flash(f'บันทึกผลเรียบร้อย {saved} รายการ', 'success')
+            if is_popup_request():
+                return popup_done(refresh_parent=True)
             return redirect(url_for('lab.dashboard'))
 
     return render_template('lab/record_form.html', order=order, items=items)
@@ -46,7 +49,7 @@ def edit_result(result_id):
     result = lab_service.get_result(result_id)
     if not result:
         flash('ไม่พบผลตรวจนี้', 'error')
-        return redirect(url_for('lab.dashboard'))
+        return popup_redirect('lab.dashboard')
 
     if request.method == 'POST':
         ok, err = lab_service.update_result(
@@ -54,11 +57,11 @@ def edit_result(result_id):
         )
         if ok:
             flash('แก้ไขผลตรวจเรียบร้อย', 'success')
-            return redirect(url_for('lab.order_detail', order_id=result['order_id']))
+            return popup_redirect('lab.order_detail', order_id=result['order_id'])
         else:
             flash(err, 'error')
             if err in ('ไม่มีสิทธิ์แก้ไขผลตรวจนี้', 'แก้ไขได้เฉพาะวันเดียวกัน'):
-                return redirect(url_for('lab.order_detail', order_id=result['order_id']))
+                return popup_redirect('lab.order_detail', order_id=result['order_id'])
 
     return render_template('lab/edit_result.html', result=result)
 

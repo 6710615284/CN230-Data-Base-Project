@@ -20,7 +20,12 @@
       <div class="section-title" style="margin-bottom:4px;">รายการตรวจ</div>
       <div class="section-sub" style="margin-bottom:0;">จำนวนทั้งหมด {{ testtypes|length if testtypes else 0 }} รายการ</div>
     </div>
-    <a href="{{ url_for('admin.testtype_new') }}" class="btn btn-primary">+ เพิ่มประเภทการตรวจ</a>
+    <a
+      href="{{ url_for('admin.testtype_new') }}"
+      class="btn btn-primary"
+      data-page-modal
+      data-modal-title="เพิ่มประเภทการตรวจ"
+    >+ เพิ่มประเภทการตรวจ</a>
   </div>
 
   {% if testtypes %}
@@ -45,7 +50,12 @@
           <td>{{ tt.normal_max or '—' }}</td>
           <td class="mono">{{ '%.2f'|format(tt.price) }}</td>
           <td>
-            <a href="{{ url_for('admin.testtype_edit', tid=tt.test_id) }}" class="btn btn-secondary btn-sm">แก้ไข</a>
+            <a
+              href="{{ url_for('admin.testtype_edit', tid=tt.test_id) }}"
+              class="btn btn-secondary btn-sm"
+              data-page-modal
+              data-modal-title="แก้ไขประเภทการตรวจ"
+            >แก้ไข</a>
           </td>
         </tr>
         {% endfor %}

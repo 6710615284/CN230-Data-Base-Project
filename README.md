@@ -1,13 +1,8 @@
 # CN230 HLIS Project
-Hospital Laboratory Information System-HLIS  
-โปรเจกต์นี้เป็นส่วนหนึ่งของ รายวิชาระบบฐานข้อมูล(วพ.230) ภาคเรียนที่ 2 ปีการศึกษา 2568  
-มหาวิทยาลัยธรรมศาสตร์
 
-พัฒนาด้วย `Flask` และ `MySQL` โดยรองรับการทำงานแยกตามบทบาท `doctor`, `lab`, และ `admin`
+Hospital Laboratory Information System (HLIS) สำหรับรายวิชาระบบฐานข้อมูล วพ.230 พัฒนาเป็นเว็บแอปด้วย `Flask` + `MySQL` เพื่อรองรับ workflow หลักของห้องปฏิบัติการในโรงพยาบาล โดยแยกสิทธิ์ตามบทบาท `doctor`, `lab` และ `admin`
 
-
-
-## <br>ผู้จัดทำ
+## ผู้จัดทำ
 
 | ชื่อ-นามสกุล | รหัสนักศึกษา |
 |---|---|
@@ -16,74 +11,60 @@ Hospital Laboratory Information System-HLIS
 | นาย เบญจพล ปินะกะสา | 6710625028 |
 | นางสาว พศิกา ศรัทธาพร | 6710625036 |
 
+## ภาพรวมระบบ
 
-
-## <br>ภาพรวมระบบ
-
-ระบบนี้ครอบคลุม workflow หลักของห้องปฏิบัติการในโรงพยาบาล ตั้งแต่การล็อกอิน, ค้นหาผู้ป่วย, สั่งตรวจ, บันทึกผล, แก้ไขผลภายใต้เงื่อนไขที่กำหนด, จัดการ master data และสรุปข้อมูล billing
+ระบบนี้ครอบคลุม workflow หลักของห้องปฏิบัติการ ตั้งแต่การล็อกอิน, ค้นหาผู้ป่วย, สั่งตรวจ, บันทึกผล, แก้ไขผลภายใต้เงื่อนไข, จัดการ master data และดูสรุป billing ภายในแอปเดียว
 
 สถานะปัจจุบันของระบบ
 
-- ล็อกอินด้วยบัญชีจากตาราง `Staff`
 - ใช้ Flask blueprints แยกโมดูลเป็น `auth`, `doctor`, `lab`, `admin`
-- แยก logic ฐานข้อมูลและธุรกิจหลักไว้ใน `app/services/`
-- มี helper กลางสำหรับ access control และ validation ใน `app/auth.py` และ `app/validators.py`
+- แยก business logic ไว้ใน `app/services/`
+- รวม helper กลางสำหรับ access control และ validation ใน `app/auth.py` และ `app/validators.py`
+- รองรับ popup/modal workflow สำหรับฟอร์มหลักบางหน้า
 - เชื่อมต่อฐานข้อมูลผ่าน `PyMySQL`
 - ใช้งานผ่าน entrypoint `run.py`
 - มี automated tests แยกไว้ในโฟลเดอร์ `tests/`
 
-
-## <br>ฟีเจอร์ตามบทบาท
+## ฟีเจอร์ตามบทบาท
 
 ### Authentication
 
-- หน้าเข้าสู่ระบบอยู่ที่ `/` และ `/login`
-- ตรวจสอบรหัสผ่านด้วย `werkzeug.security.check_password_hash`
-- เก็บ `staff_id`, `name`, `role` ใน `session`
-- หลังล็อกอินสำเร็จจะ redirect ไปยัง dashboard ตามบทบาท
+- ล็อกอินผ่าน `/` หรือ `/login`
+- ใช้ `session` เก็บ `staff_id`, `name` และ `role`
+- redirect ไปยัง dashboard ตามบทบาทหลังล็อกอินสำเร็จ
 - ล็อกเอาต์ผ่าน `/logout`
 
 ### Doctor
 
 - ค้นหาผู้ป่วยด้วยชื่อหรือ `HN`
-- แสดงรายการผู้ป่วยทั้งหมดเมื่อยังไม่กรอกคำค้น
-- สร้าง order ใหม่ให้ผู้ป่วย 1 คน โดยเลือกได้หลาย test ต่อ 1 order
-- กำหนดความเร่งด่วนเป็น `routine` หรือ `urgent`
-- สร้าง `Billing` อัตโนมัติตามราคาจาก `Test_Type`
+- สร้าง lab order ใหม่พร้อมเลือกหลายรายการตรวจ
+- กำหนดความเร่งด่วนได้เป็น `routine` หรือ `urgent`
+- ระบบสร้าง `Billing` ให้แต่ละรายการตรวจอัตโนมัติ
 - ดูประวัติ order และผลตรวจย้อนหลังของผู้ป่วย
-- ยกเลิก order ได้เฉพาะ order ของตัวเองที่ยัง `pending`
-- เปลี่ยนรหัสผ่านของตัวเองได้จากหน้า profile
+- ยกเลิก order ได้เฉพาะของตัวเองที่ยัง `pending`
+- เปลี่ยนรหัสผ่านของตัวเองได้
 
 ### Lab
 
-- ดูคิว order ที่ยัง `pending`
-- เรียงคิวโดยให้ `urgent` ขึ้นก่อน
-- เปิดดูรายละเอียด order พร้อมรายการตรวจทั้งหมด
-- บันทึกผลได้หลายรายการในหน้าเดียว
-- ตรวจสอบค่าผิดปกติจาก `normal_min` และ `normal_max` อัตโนมัติ
-- เปลี่ยน `Lab_Order_Item` เป็น `completed` หลังบันทึกผล
-- เปลี่ยน `Lab_Order` เป็น `completed` อัตโนมัติเมื่อไม่มีรายการค้าง
-- แก้ไขผลได้เฉพาะผู้ที่บันทึกผลนั้น และต้องอยู่ภายในวันเดียวกัน
-- เปลี่ยนรหัสผ่านของตัวเองได้จากหน้า profile
+- ดูคิวงาน `pending` โดยเรียง `urgent` ก่อน
+- บันทึกผลตรวจหลายรายการในหน้าเดียว
+- ตรวจ abnormal จากช่วง `normal_min` / `normal_max` อัตโนมัติ
+- เปลี่ยนสถานะ `Lab_Order_Item` และ `Lab_Order` อัตโนมัติเมื่อบันทึกผลครบ
+- แก้ไขผลตรวจได้เฉพาะผู้ที่บันทึกเองและต้องเป็นวันเดียวกัน
+- เปลี่ยนรหัสผ่านของตัวเองได้
 
 ### Admin
 
-- หน้า `/admin/dashboard` จะ redirect ไปที่หน้าจัดการผู้ป่วย
 - จัดการข้อมูลผู้ป่วย: ค้นหา, เพิ่ม, แก้ไข, ลบ
-- การเพิ่มผู้ป่วยใหม่จะ generate `HN` อัตโนมัติในรูปแบบ `HN-00001`
-- ป้องกันการลบผู้ป่วยที่มี `Lab_Order` เชื่อมอยู่แล้ว
-- จัดการข้อมูลเจ้าหน้าที่: เพิ่ม, แก้ไข, รีเซ็ตรหัสผ่าน, ลบ
-- ตอนเพิ่มเจ้าหน้าที่ใหม่ ระบบจะสร้าง `username` และรหัสผ่านเริ่มต้นให้อัตโนมัติ
-- ป้องกันการลบบัญชีตัวเอง และป้องกันการลบเจ้าหน้าที่ที่มี `Lab_Order` หรือ `Lab_Result` เชื่อมอยู่
-- จัดการ `Test_Type`: เพิ่มและแก้ไขชื่อการตรวจ, หน่วย, ค่าปกติอ้างอิง, และราคา
-- ดูรายงานบิลแบบสรุปรายผู้ป่วย
-- กรองรายงานบิลตามช่วงวันที่ได้
-- เปิดดูรายละเอียดบิลของผู้ป่วยแต่ละคนแบบแยกตาม order และ test
-- ยกเลิก order จากหน้ารายละเอียดบิลได้เฉพาะ order ที่ยัง `pending`
+- สร้าง `HN` อัตโนมัติรูปแบบ `HN-00001`
+- จัดการเจ้าหน้าที่: เพิ่ม, แก้ไข, รีเซ็ตรหัสผ่าน, ลบ
+- สร้าง username เจ้าหน้าที่อัตโนมัติตาม role เช่น `doc0001`, `lab0003`, `adm0005`
+- กำหนดรหัสผ่านเริ่มต้นอัตโนมัติรูปแบบ `Hlis0001`
+- จัดการ `Test_Type`
+- ดูรายงาน billing พร้อมกรองตามวันที่
+- ยกเลิก order จากฝั่ง billing ได้เฉพาะ order ที่ยัง `pending`
 
-
-
-## <br>เทคโนโลยีที่ใช้
+## เทคโนโลยีที่ใช้
 
 - Python 3
 - Flask 3
@@ -93,9 +74,7 @@ Hospital Laboratory Information System-HLIS
 - python-dotenv
 - Werkzeug security helpers
 
-
-
-## <br>โครงสร้างโปรเจกต์
+## โครงสร้างโปรเจกต์
 
 ```text
 CN230/
@@ -107,59 +86,67 @@ CN230/
 |   |-- auth.py
 |   |-- config.py
 |   |-- db.py
+|   |-- popup.py
 |   |-- validators.py
 |   |-- routes/
-|   |   |-- __init__.py
-|   |   |-- admin.py
 |   |   |-- auth.py
 |   |   |-- doctor.py
-|   |   `-- lab.py
+|   |   |-- lab.py
+|   |   `-- admin.py
 |   |-- services/
-|   |   |-- __init__.py
-|   |   |-- admin_service.py
 |   |   |-- auth_service.py
 |   |   |-- doctor_service.py
-|   |   `-- lab_service.py
+|   |   |-- lab_service.py
+|   |   `-- admin_service.py
 |   |-- static/
 |   |   `-- style.css
 |   `-- templates/
 |       |-- base.html
 |       |-- login.html
-|       |-- admin/
-|       |   |-- billing.html
-|       |   |-- billing_detail.html
-|       |   |-- patient_form.html
-|       |   |-- patients.html
-|       |   |-- staff.html
-|       |   |-- staff_form.html
-|       |   |-- testtype.html
-|       |   `-- testtype_form.html
+|       |-- popup_done.html
 |       |-- doctor/
-|       |   |-- dashboard.html
-|       |   |-- order_form.html
-|       |   |-- profile.html
-|       |   `-- results.html
-|       `-- lab/
-|           |-- dashboard.html
-|           |-- edit_result.html
-|           |-- profile.html
-|           `-- record_form.html
+|       |-- lab/
+|       `-- admin/
 |-- database/
 |   |-- schema.sql
 |   `-- seed.sql
 `-- tests/
-    |-- __init__.py
+    |-- web_test_case.py
+    |-- fakes.py
+    |-- test_auth.py
     |-- test_routes.py
     |-- test_routes_additional.py
     |-- test_services.py
-    `-- test_services_additional.py
+    |-- test_services_additional.py
+    |-- test_services_more.py
+    `-- test_validators.py
 ```
 
+## โครงสร้างระบบ
 
+### Blueprints
 
-## <br>โครงสร้างฐานข้อมูล
+- `auth_bp` สำหรับล็อกอินและล็อกเอาต์
+- `doctor_bp` สำหรับ dashboard, order, results และ profile ของแพทย์
+- `lab_bp` สำหรับ queue, บันทึกผล, แก้ไขผล และ profile ของห้องแล็บ
+- `admin_bp` สำหรับผู้ป่วย, เจ้าหน้าที่, test types และ billing
 
-ไฟล์ `database/schema.sql` จะสร้างฐานข้อมูล `hlis` และตารางหลักดังนี้
+### Service Layer
+
+- `app/services/auth_service.py` ตรวจสอบการล็อกอิน
+- `app/services/doctor_service.py` ดูแล patient search, order creation, result lookup, cancel order
+- `app/services/lab_service.py` ดูแล pending queue, result recording และ same-day edit rule
+- `app/services/admin_service.py` ดูแล patient, staff, test type และ billing operations
+
+### Validation และ Access Control
+
+- `app/auth.py` มี `role_required()` สำหรับตรวจสิทธิ์จาก `session`
+- `app/validators.py` รวม validation ของฟอร์มที่ใช้ซ้ำ
+- `app/popup.py` ช่วยรองรับ flow ที่เปิดฟอร์มใน popup/modal
+
+## ฐานข้อมูล
+
+ไฟล์ `database/schema.sql` สร้างฐานข้อมูล `hlis` และตารางหลักดังนี้
 
 - `Patient`
 - `Staff`
@@ -169,71 +156,31 @@ CN230/
 - `Lab_Result`
 - `Billing`
 
-ความสัมพันธ์หลัก
+ความสัมพันธ์หลักของระบบ
 
-- `Staff(role=doctor)` เป็นผู้สร้าง `Lab_Order`
+- ผู้ป่วย 1 คนมีได้หลาย `Lab_Order`
 - 1 `Lab_Order` มีหลาย `Lab_Order_Item`
-- แต่ละ `Lab_Order_Item` มีผลตรวจได้ 1 รายการใน `Lab_Result`
-- แต่ละ `Lab_Order_Item` มีข้อมูล billing ได้ 1 รายการใน `Billing`
+- แต่ละ `Lab_Order_Item` มี `Billing` ได้ 1 รายการ
+- แต่ละ `Lab_Order_Item` มี `Lab_Result` ได้ 1 รายการ
+- `Staff` ถูกใช้ทั้งในบทบาทผู้สั่งตรวจและผู้บันทึกผล
 
-ข้อสังเกตจาก schema
+กฎข้อมูลที่สำคัญ
 
-- `Staff.role` รองรับเฉพาะ `doctor`, `lab`, `admin`
-- `Lab_Order.status` รองรับ `pending`, `completed`, `cancelled`
-- `Lab_Order.priority` รองรับ `routine`, `urgent`
-- `Lab_Result.order_item_id` และ `Billing.order_item_id` เป็น `UNIQUE`
+- `Patient.HN` เป็น `UNIQUE`
+- `Staff.username` เป็น `UNIQUE`
+- `Lab_Result.order_item_id` เป็น `UNIQUE`
+- `Billing.order_item_id` เป็น `UNIQUE`
+- ใช้ `ENUM` จำกัดค่า role, order status, priority และ item status
 
-
-
-## <br>Seed Data
-
-ไฟล์ `database/seed.sql` มีข้อมูลตัวอย่างสำหรับ
-
-- เจ้าหน้าที่ 5 บัญชี
-- ผู้ป่วย 5 คน
-- ประเภทการตรวจ 7 รายการ
-- ตัวอย่าง order, result, และ billing สำหรับทดสอบระบบ
-- สถานะ `Lab_Order` หลายแบบทั้ง `completed`, `pending`, `cancelled`
-- pending queue สำหรับทดสอบหน้าฝั่ง `lab`
-- ผลตรวจผิดปกติสำหรับทดสอบการแสดงผล abnormal
-
-บัญชีตัวอย่างใน seed data: `doctor1`, `doctor2`, `lab1`, `lab2`, `admin1`
-
-> **หมายเหตุ:** บัญชีใน `database/seed.sql` ใช้รหัสผ่านเริ่มต้นรูปแบบ `<username>@hlis2026` และเจ้าหน้าที่ที่สร้างผ่านหน้า `admin` จะได้รหัสผ่านเริ่มต้นรูปแบบเดียวกัน
-
-ตัวอย่าง credential ที่ใช้ล็อกอินได้ทันที
-
-| Username | Password |
-|----------|----------|
-| `doctor1` | `doctor1@hlis2026` |
-| `doctor2` | `doctor2@hlis2026` |
-| `lab1` | `lab1@hlis2026` |
-| `lab2` | `lab2@hlis2026` |
-| `admin1` | `admin1@hlis2026` |
-
-ตัวอย่างการสร้าง hash ใหม่
-
-```bash
-python3 -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('admin123'))"
-```
-
-ตัวอย่างการอัปเดตใน MySQL
-
-```sql
-UPDATE Staff
-SET password_hash = 'ใส่ค่า hash ที่ generate ได้'
-WHERE username = 'admin1';
-```
-
----
-
-## <br>การติดตั้ง
+## การติดตั้ง
 
 ### 1. สร้าง virtual environment
 
 ```bash
 python -m venv venv
 ```
+
+ถ้าต้องการใช้ชื่อโฟลเดอร์เป็น `.venv` ก็สามารถใช้ได้เช่นกัน แต่ตัวอย่างใน README นี้จะอ้างอิง `venv/` ตามที่มีอยู่ในโปรเจกต์ปัจจุบัน
 
 ### 2. เปิดใช้งาน virtual environment
 
@@ -255,17 +202,15 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+### 4. สร้างไฟล์ `.env`
 
-
-### 4. การตั้งค่า `.env`
-
-สร้างไฟล์ `.env` ที่ root ของโปรเจกต์
+คัดลอก `.env.example` เป็น `.env` แล้วแก้ค่าตามเครื่องของคุณ
 
 ```env
-SECRET_KEY=your_secret_key
+SECRET_KEY=dev-secret-key-change-this
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=
 DB_NAME=hlis
 ```
 
@@ -277,9 +222,7 @@ DB_NAME=hlis
 - `DB_PASSWORD=` ว่าง
 - `DB_NAME=hlis`
 
-
-
-### 5. การเตรียมฐานข้อมูล
+### 5. เตรียมฐานข้อมูล
 
 สร้าง schema
 
@@ -287,15 +230,19 @@ DB_NAME=hlis
 mysql -u root -p < database/schema.sql
 ```
 
-เติมข้อมูลตัวอย่าง
+ถ้าต้องการข้อมูลตัวอย่าง ให้ import `database/seed.sql` เพิ่มเติม
 
 ```bash
 mysql -u root -p hlis < database/seed.sql
 ```
 
+## วิธีรันโปรเจกต์
 
+```bash
+venv/bin/python run.py
+```
 
-## <br>วิธีรันโปรเจกต์
+หรือหาก activate environment ไว้แล้ว
 
 ```bash
 python run.py
@@ -303,53 +250,15 @@ python run.py
 
 จากนั้นเปิดที่ `http://127.0.0.1:5000/`
 
-> **หมายเหตุ:** แอปรันด้วย `debug=True` ใน `run.py`
+หมายเหตุ: `run.py` รันแอปด้วย `debug=True` ซึ่งเหมาะกับการพัฒนาในเครื่อง
 
-
-## <br>Automated Tests
-
-โปรเจกต์มี automated tests อยู่ในโฟลเดอร์ `tests/` โดยเน้น route tests ผ่าน Flask test client และ service tests สำหรับ business rules ที่ไม่ต้องต่อ MySQL จริง
-
-รันทั้งหมด
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-ถ้าใช้ virtual environment ของโปรเจกต์โดยตรง
-
-```bash
-venv/bin/python -m unittest discover -s tests -v
-```
-
-
-ขอบเขตที่ครอบแล้ว
-
-- ตรวจว่า app factory register routes หลักครบ
-- ตรวจ login, logout, session, และ redirect ตาม role
-- ตรวจ access control ของหน้า `doctor`, `lab`, และ `admin`
-- ตรวจ flow สำคัญของ route ฝั่ง `doctor`, `lab`, และ `admin`
-- ตรวจ edge cases เช่น input ว่าง, password ไม่ตรงกัน, wrong role, wrong password, record/order/patient ไม่พบ
-- ตรวจ logic ของ `auth_service`, `doctor_service`, `lab_service`, และบางส่วนของ `admin_service`
-- ตรวจ business rules เช่น abnormal range, save result, same-day edit rule, cancel order, duplicate HN, และ password hashing
-
-ไฟล์ทดสอบหลัก
-
-- `tests/test_routes.py`
-- `tests/test_routes_additional.py`
-- `tests/test_services.py`
-- `tests/test_services_additional.py`
-
-> **หมายเหตุ:** ชุดนี้ยังเป็น unit/route tests เป็นหลัก และยังไม่ใช่ integration tests กับฐานข้อมูลจริง ถ้าจะเพิ่ม integration tests ต่อไป แนะนำแยกฐานข้อมูลสำหรับทดสอบโดยเฉพาะ เช่น `hlis_test`
-
-
-## <br>เส้นทางหลักของระบบ
+## Route หลัก
 
 ### Auth
 
-- `GET /` และ `GET /login` — หน้าล็อกอิน
-- `POST /login` — ส่งข้อมูลล็อกอิน
-- `GET /logout` — ล็อกเอาต์
+- `GET|POST /`
+- `GET|POST /login`
+- `GET /logout`
 
 ### Doctor
 
@@ -385,27 +294,31 @@ venv/bin/python -m unittest discover -s tests -v
 - `GET /admin/billing/<patient_id>`
 - `POST /admin/order/cancel/<order_id>`
 
+## Automated Tests
 
+โปรเจกต์มีชุดทดสอบในโฟลเดอร์ `tests/` ครอบคลุม route tests, service tests, validators และ helper logic โดยใช้ `unittest`, Flask test client และ test doubles สำหรับฐานข้อมูล
 
-## <br>ไฟล์สำคัญ
+รันทั้งหมด
 
-| ไฟล์ | คำอธิบาย |
-|------|---------|
-| `run.py` | ใช้สร้างและรัน Flask app |
-| `app/__init__.py` | สร้างแอปและ register blueprints |
-| `app/auth.py` | decorator สำหรับตรวจ role ใน session |
-| `app/config.py` | โหลดค่าตั้งต้นและ environment variables |
-| `app/db.py` | สร้าง connection ไปยัง MySQL |
-| `app/validators.py` | logic ตรวจสอบข้อมูลฟอร์มที่ใช้ซ้ำหลายหน้า |
-| `app/routes/` | HTTP routes แยกตามบทบาท |
-| `app/services/` | business logic และคำสั่ง query หลัก |
-| `database/schema.sql` | โครงสร้างฐานข้อมูล |
-| `database/seed.sql` | ข้อมูลตัวอย่างเริ่มต้น |
-| `tests/` | automated tests สำหรับ routes และ services |
+```bash
+venv/bin/python -m unittest discover -s tests -v
+```
 
+หรือถ้า activate environment ไว้แล้ว
 
-## <br>ข้อจำกัดที่ยังมีอยู่
+```bash
+python -m unittest discover -s tests -v
+```
 
-- automated tests ตอนนี้ยังเน้น unit/route tests และยังไม่มี integration tests กับฐานข้อมูลจริง
-- มีการรวม access control เป็น decorator กลาง และรวม validation ฟอร์มหลักไว้ใน helper กลางแล้ว แต่ยังไม่ได้ใช้ form library หรือ policy layer เต็มรูปแบบ
-- ยังไม่มีฟีเจอร์ export รายงาน, audit trail, หรือ dashboard เชิงสถิติ
+สิ่งที่ชุดทดสอบครอบคลุม
+
+- login, logout, redirect และ session ตาม role
+- access control ของแต่ละ blueprint
+- business rules เช่น cancel order, abnormal detection และ same-day edit rule
+- validation ของฟอร์มหลัก
+- service logic ที่ไม่ต้องต่อ MySQL จริง
+
+ข้อจำกัดปัจจุบัน
+
+- ชุดทดสอบยังเน้น unit/route tests และยังไม่มี integration tests กับฐานข้อมูลจริง
+- ยังไม่มีฟีเจอร์ export รายงาน, audit trail หรือ dashboard เชิงสถิติ

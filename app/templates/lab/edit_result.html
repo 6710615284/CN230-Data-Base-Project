@@ -67,7 +67,7 @@
 
 <div class="card" style="max-width:560px;">
   <div class="section-title">แก้ไขค่า</div>
-  <form method="POST" action="{{ url_for('lab.edit_result', result_id=result.result_id) }}">
+  <form method="POST" action="{{ popup_url('lab.edit_result', result_id=result.result_id) }}">
     <div class="form-group">
       <label for="value">ค่าใหม่ที่ต้องการแก้ไข</label>
       <input
@@ -83,7 +83,7 @@
     </div>
 
     <div class="form-actions">
-      <a href="{{ url_for('lab.order_detail', order_id=result.order_id) }}" class="btn btn-secondary">ยกเลิก</a>
+      <a href="{{ popup_url('lab.order_detail', order_id=result.order_id) }}" class="btn btn-secondary">ยกเลิก</a>
       <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
     </div>
   </form>

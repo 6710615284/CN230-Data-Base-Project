@@ -55,7 +55,7 @@
   </div>
 </div>
 
-<form method="POST" class="card">
+<form method="POST" action="{{ popup_url('doctor.order_new', patient_id=patient.patient_id) }}" class="card">
   <div class="section-title">รายละเอียดการสั่งตรวจ</div>
   <div class="form-row">
     <div class="form-group">
@@ -97,7 +97,11 @@
   </div>
 
   <div class="form-actions">
-    <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary">ยกเลิก</a>
+    <a
+      href="{{ popup_url('doctor.dashboard') }}"
+      class="btn btn-secondary"
+      {% if popup_mode %}data-popup-close{% endif %}
+    >ยกเลิก</a>
     <button type="submit" class="btn btn-primary">ยืนยันการสั่งตรวจ</button>
   </div>
 </form>

@@ -83,7 +83,12 @@
             <span class="badge badge-pending">{{ o.pending_items }}/{{ o.total_items }} รายการ</span>
           </td>
           <td>
-            <a href="{{ url_for('lab.order_detail', order_id=o.order_id) }}" class="btn btn-primary btn-sm">บันทึกผล</a>
+            <a
+              href="{{ url_for('lab.order_detail', order_id=o.order_id) }}"
+              class="btn btn-primary btn-sm"
+              data-page-modal
+              data-modal-title="บันทึกผลตรวจ"
+            >บันทึกผล</a>
           </td>
         </tr>
         {% endfor %}

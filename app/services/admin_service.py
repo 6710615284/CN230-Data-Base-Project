@@ -1,3 +1,5 @@
+import uuid
+
 from werkzeug.security import generate_password_hash
 from app.db import get_db
 
@@ -130,33 +132,43 @@ def get_staff(staff_id):
         conn.close()
 
 
+def _staff_role_prefix(role):
+    prefixes = {
+        "doctor": "doc",
+        "lab": "lab",
+        "admin": "adm",
+    }
+    return prefixes[role]
+
+
+def _format_staff_username(role, staff_id):
+    return f"{_staff_role_prefix(role)}{staff_id:04d}"
+
+
+def _format_staff_password(staff_id):
+    return f"Hlis{staff_id:04d}"
+
+
 def create_staff(name, role):
     """
     สร้าง staff พร้อม auto-generate username + default password
-    คืน (username, raw_password) หรือ raise ถ้า username ซ้ำ
+    คืน (username, raw_password)
     """
     conn = get_db()
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT COALESCE(MAX(staff_id), 0) AS max_id FROM Staff")
-            max_id = cur.fetchone()["max_id"]
-            username = f"{role}{max_id + 1}"
-
-            cur.execute("SELECT 1 FROM Staff WHERE username = %s", (username,))
-            if cur.fetchone():
-                raise ValueError(f"username '{username}' มีในระบบแล้ว กรุณาลองใหม่")
-
+            temp_username = f"tmp_{uuid.uuid4().hex[:12]}"
             cur.execute(
                 "INSERT INTO Staff (name, role, username, password_hash) VALUES (%s,%s,%s,'')",
-                (name, role, username),
+                (name, role, temp_username),
             )
-            conn.commit()
 
             staff_id = cur.lastrowid
-            raw_pw = f"{username}@hlis2026"
+            username = _format_staff_username(role, staff_id)
+            raw_pw = _format_staff_password(staff_id)
             cur.execute(
-                "UPDATE Staff SET password_hash = %s WHERE staff_id = %s",
-                (generate_password_hash(raw_pw), staff_id),
+                "UPDATE Staff SET username = %s, password_hash = %s WHERE staff_id = %s",
+                (username, generate_password_hash(raw_pw), staff_id),
             )
         conn.commit()
         return username, raw_pw
