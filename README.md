@@ -173,7 +173,6 @@ CN230/
 - ใช้ `ENUM` จำกัดค่า role, order status, priority และ item status
 
 ## การติดตั้ง
-
 ### 1. สร้าง virtual environment
 
 ```bash
