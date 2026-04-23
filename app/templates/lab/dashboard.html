@@ -23,7 +23,7 @@
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-label">Pending Orders</div>
-      <div class="stat-value">{{ orders|length }}</div>
+      <div class="stat-value">{{ orders|length if orders else 0 }}</div>
       <div class="stat-note">จำนวน Order ที่รอบันทึกผล</div>
     </div>
     <div class="stat-card">
@@ -37,8 +37,8 @@
       <div class="stat-note">เรียงลำดับคิวเพื่อดำเนินการบันทึกผล</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">System</div>
-      <div class="stat-value" style="font-size:22px;">HLIS</div>
+      <div class="stat-label">Status</div>
+      <div class="stat-value" style="font-size:22px;">Ready</div>
       <div class="stat-note">พร้อมสำหรับการบันทึกผลตรวจ</div>
     </div>
   </div>
@@ -50,7 +50,7 @@
 
   {% if orders %}
   <div class="table-shell">
-    <table class="table">
+    <table class="table lab-table">
       <thead>
         <tr>
           <th>Order #</th>

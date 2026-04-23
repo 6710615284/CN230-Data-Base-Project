@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Zen+Old+Mincho:wght@400;500;600;700;900&display=swap');
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -43,7 +46,7 @@ html {
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: "Zen Old Mincho", "Noto Sans Thai", sans-serif;
   font-size: 14px;
   color: var(--text);
   background:
@@ -881,4 +884,32 @@ textarea.input:focus {
     height: 100vh;
     border-radius: 0;
   }
+}
+
+.doctor-table th:nth-child(4),
+.doctor-table td:nth-child(4) {
+  text-align: center;
+}
+
+.testtype-table th:nth-child(3),
+.testtype-table td:nth-child(3),
+.testtype-table th:nth-child(4),
+.testtype-table td:nth-child(4) {
+  text-align: center;
+}
+
+.lab-table th:nth-child(1),
+.lab-table td:nth-child(1) {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin-patient-table th:nth-child(4),
+.admin-patient-table td:nth-child(4) {
+    text-align: center;
+}
+
+.admin-billing-table th:nth-child(3),
+.admin-billing-table td:nth-child(3) {
+    text-align: center;
 }
