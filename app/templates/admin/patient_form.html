@@ -14,7 +14,7 @@
   <p class="sub">กรอกข้อมูลพื้นฐานของผู้ป่วยให้ครบถ้วน</p>
 </div>
 
-<div class="card" style="max-width:720px;">
+<div class="card patient-form-card">
   <form
     method="POST"
     action="{{ popup_url('admin.patient_new') if action == 'new' else popup_url('admin.patient_edit', pid=patient.patient_id) }}"

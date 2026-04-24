@@ -23,11 +23,7 @@
       <div class="section-title" style="margin-bottom:4px;">สรุปผู้ป่วย</div>
       <div class="section-sub" style="margin-bottom:0;">รายละเอียดค่าใช้จ่ายแยกตามรายการตรวจ</div>
     </div>
-    <a
-      href="{{ popup_url('admin.billing') }}"
-      class="btn btn-secondary"
-      {% if popup_mode %}data-popup-close{% endif %}
-    >← กลับ</a>
+
   </div>
 
   <table class="table-info">
@@ -38,7 +34,7 @@
 
 {% if items %}
 <div class="table-shell">
-  <table class="table">
+  <table class="table admin-billing-detail-table">
     <thead>
       <tr>
         <th>Order #</th>

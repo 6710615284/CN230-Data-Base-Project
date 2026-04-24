@@ -894,7 +894,9 @@ textarea.input:focus {
 .testtype-table th:nth-child(3),
 .testtype-table td:nth-child(3),
 .testtype-table th:nth-child(4),
-.testtype-table td:nth-child(4) {
+.testtype-table td:nth-child(4),
+.testtype-table th:nth-child(5),
+.testtype-table td:nth-child(5) {
   text-align: center;
 }
 
@@ -910,8 +912,20 @@ textarea.input:focus {
 }
 
 .admin-billing-table th:nth-child(3),
-.admin-billing-table td:nth-child(3) {
-    text-align: center;
+.admin-billing-table td:nth-child(3),
+.admin-billing-table th:nth-child(4),
+.admin-billing-table td:nth-child(4),
+.admin-billing-table th:nth-child(5),
+.admin-billing-table td:nth-child(5) {
+  text-align: center;
+}
+
+.admin-billing-table tfoot td {
+  text-align: center;
+}
+
+.admin-billing-table tfoot td:first-child {
+  text-align: left;
 }
 
 .flash {
@@ -947,3 +961,385 @@ textarea.input:focus {
   cursor: not-allowed;
   box-shadow: none;
 }
+
+.patient-form-card {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px;
+  min-height: 380px;
+}
+
+.patient-form-card .form-row {
+  gap: 18px;
+}
+
+.patient-form-card .form-group {
+  margin-bottom: 4px;
+}
+
+.patient-form-card .input {
+  min-height: 48px;
+}
+
+.patient-form-card .form-actions {
+  margin-top: 28px;
+}
+
+.staff-table {
+  table-layout: fixed;
+}
+
+.staff-table th:nth-child(1),
+.staff-table td:nth-child(1) {
+  width: 110px;
+  text-align: center;
+}
+
+.staff-table th:nth-child(2),
+.staff-table td:nth-child(2) {
+  width: 260px;
+}
+
+.staff-table th:nth-child(3),
+.staff-table td:nth-child(3) {
+  width: 220px;
+}
+
+.staff-table th:nth-child(4),
+.staff-table td:nth-child(4) {
+  width: 160px;
+  text-align: center;
+}
+
+.staff-table th:nth-child(5),
+.staff-table td:nth-child(5) {
+  width: 300px;
+  text-align: center;
+}
+
+.staff-table td:nth-child(5) {
+  white-space: nowrap;
+}
+
+.testtype-form-card{
+    width:100%;
+    max-width:1080px;
+    margin:0 auto;
+    padding:36px;
+    min-height:420px;
+}
+
+.testtype-form-card .form-row{
+    gap:20px;
+}
+
+.testtype-form-card .input{
+    min-height:48px;
+}
+
+.testtype-form-card .form-actions{
+    margin-top:28px;
+}
+
+.lab-queue-card {
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.lab-queue-card > div:first-child {
+  align-items: flex-start !important;
+}
+
+.doctor-result-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.doctor-result-table th,
+.doctor-result-table td {
+  vertical-align: middle;
+}
+
+.doctor-result-table th:nth-child(1),
+.doctor-result-table td:nth-child(1) {
+  width: 27%;
+  text-align: left;
+}
+
+.doctor-result-table th:nth-child(2),
+.doctor-result-table td:nth-child(2) {
+  width: 15%;
+  text-align: center;
+}
+
+.doctor-result-table th:nth-child(3),
+.doctor-result-table td:nth-child(3) {
+  width: 20%;
+  text-align: center;
+}
+
+.doctor-result-table th:nth-child(4),
+.doctor-result-table td:nth-child(4) {
+  width: 13%;
+  text-align: center;
+}
+
+.doctor-result-table th:nth-child(5),
+.doctor-result-table td:nth-child(5) {
+  width: 11%;
+  text-align: center;
+}
+
+.doctor-result-table th:nth-child(6),
+.doctor-result-table td:nth-child(6) {
+  width: 14%;
+  text-align: center;
+}
+
+.profile-page {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.profile-title-row {
+  margin-bottom: 28px;
+}
+
+.profile-account-card {
+  background: #fff;
+  border: 1px solid #dceff2;
+  border-radius: 24px;
+  padding: 34px 42px;
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 34px;
+  align-items: center;
+  box-shadow: 0 18px 45px rgba(15, 75, 90, 0.08);
+  margin-bottom: 28px;
+}
+
+.profile-avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #e9fbfd, #d8f3f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 58px;
+  box-shadow: inset 0 0 0 10px #f6feff;
+}
+
+.profile-account-info h2 {
+  margin-bottom: 18px;
+  color: #0b6670;
+}
+
+.profile-info-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf4f5;
+}
+
+.profile-info-row span {
+  color: #6d8790;
+}
+
+.profile-info-row strong {
+  color: #123b46;
+}
+
+.role-pill {
+  width: fit-content;
+  padding: 7px 18px;
+  border-radius: 999px;
+  background: #e8f8fb;
+  color: #0b6670 !important;
+}
+
+.profile-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.profile-password-card,
+.profile-security-card {
+  padding: 34px;
+  border-radius: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.section-title h2 {
+  margin: 0;
+  color: #0b6670;
+}
+
+.section-title p {
+  margin: 4px 0 0;
+  color: #6d8790;
+}
+
+.section-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: #e8f8fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.profile-password-card .input {
+  height: 52px;
+}
+
+.profile-password-card .form-actions {
+  margin-top: 28px;
+  justify-content: flex-end;
+}
+
+.profile-security-card {
+  background: #f8fdfe;
+}
+
+.security-item {
+  display: flex;
+  gap: 14px;
+  padding: 18px 0;
+  border-top: 1px solid #e2eff2;
+}
+
+.security-item p {
+  margin: 5px 0 0;
+  color: #6d8790;
+}
+
+.security-icon {
+  color: #0b8a70;
+  font-size: 18px;
+}
+
+@media (max-width: 900px) {
+  .profile-account-card,
+  .profile-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-avatar {
+    margin: 0 auto;
+  }
+}
+
+.compact-profile-grid {
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: start;
+}
+
+.compact-password-card,
+.compact-security-card {
+  padding: 24px 30px;
+  min-height: unset;
+}
+
+.compact-password-card .section-title,
+.compact-security-card .section-title {
+  margin-bottom: 18px;
+}
+
+.compact-password-card .input {
+  height: 48px;
+}
+
+.compact-password-card .form-group {
+  margin-bottom: 14px;
+}
+
+.compact-password-card .form-actions {
+  margin-top: 18px;
+}
+
+.compact-security-card .security-item {
+  padding: 16px 0;
+}
+
+.compact-security-card .security-item:first-of-type {
+  border-top: 1px solid #e2eff2;
+}
+
+.compact-security-card .security-icon,
+.compact-profile-grid .section-icon {
+  display: none;
+}
+
+/* ลดขนาดหัวข้อเปลี่ยนรหัสผ่าน */
+.compact-password-card .section-title h2{
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+}
+
+/* ลดขนาดข้อความอธิบาย */
+.compact-password-card .section-title p{
+    font-size: 14px;
+    font-weight: 500;
+    color: #6f8790;
+    margin-top: 6px;
+}
+
+/* ลดระยะห่างหัวข้อ */
+.compact-password-card .section-title{
+    margin-bottom: 16px;
+}
+
+.compact-security-card .section-title h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.compact-security-card .section-title {
+  margin-bottom: 16px;
+}
+
+.profile-avatar i {
+  font-size: 64px;
+  color: #1f8ca0;
+}
+
+.mini-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: #e8f8fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mini-icon i {
+  font-size: 24px;
+  color: #0f7f95;
+}
+
+.security-item{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+    padding:18px 0;
+    border-top:1px solid #edf2f4;
+}
+

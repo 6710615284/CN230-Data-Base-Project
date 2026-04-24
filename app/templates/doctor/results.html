@@ -18,7 +18,6 @@
 {% if popup_mode %}
 <div class="toolbar" style="margin-bottom:16px;">
   <div></div>
-  <a href="{{ popup_url('doctor.dashboard') }}" class="btn btn-secondary" data-popup-close>ปิดหน้าต่าง</a>
 </div>
 {% endif %}
 
@@ -57,7 +56,7 @@
   </div>
   {% else %}
   <div class="table-shell" style="margin-top:12px;">
-    <table class="table">
+    <table class="table doctor-result-table">
       <thead>
         <tr>
           <th>รายการตรวจ</th>

@@ -37,14 +37,14 @@
       <div class="stat-note">เรียงลำดับคิวเพื่อดำเนินการบันทึกผล</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Status</div>
-      <div class="stat-value" style="font-size:22px;">Ready</div>
-      <div class="stat-note">พร้อมสำหรับการบันทึกผลตรวจ</div>
+      <div class="stat-label">MODE</div>
+      <div class="stat-value" style="font-size:22px;">Active</div>
+      <div class="stat-note">พร้อมสำหรับดำเนินงานห้องปฏิบัติการ</div>
     </div>
   </div>
 </div>
 
-<div class="card">
+<div class="card lab-queue-card">
   <div class="toolbar" style="margin-bottom:12px;">
     <div>
       <div class="section-title" style="margin-bottom:4px;">คิวรอดำเนินการ</div>
@@ -89,6 +89,7 @@
           data-priority="{{ o.priority }}"
           data-pending="{{ o.pending_items }}"
           data-ordered="{{ o.ordered_at.isoformat() if o.ordered_at else '' }}"
+          data-order-id="{{ o.order_id }}"
         >
           <td class="mono">{{ o.order_id }}</td>
           <td>

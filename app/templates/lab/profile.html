@@ -2,60 +2,104 @@
 {% block title %}โปรไฟล์{% endblock %}
 
 {% block nav_links %}
-  <a href="{{ url_for('lab.dashboard') }}" class="nav-tab">คิวรอตรวจ</a>
+  <a href="{{ url_for('lab.dashboard') }}" class="nav-tab">คิวรอบันทึกผล</a>
   <a href="{{ url_for('lab.profile') }}" class="nav-tab active">โปรไฟล์</a>
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <h1>โปรไฟล์เจ้าหน้าที่ห้องปฏิบัติการ</h1>
-  <p class="sub">ดูข้อมูลบัญชีและเปลี่ยนรหัสผ่าน</p>
-</div>
+<div class="profile-page">
 
-<div class="quick-grid">
-  <div class="card">
-    <div class="section-title">ข้อมูลบัญชี</div>
-    <table class="table-info">
-      <tr><td>ชื่อ</td><td>{{ session.name }}</td></tr>
-      <tr><td>Role</td><td><span class="badge role-lab">lab</span></td></tr>
-    </table>
+  <div class="page-header profile-title-row">
+    <div>
+      <h1>โปรไฟล์นักเทคนิคการแพทย์</h1>
+      <p>ตรวจสอบข้อมูลบัญชีและเปลี่ยนรหัสผ่าน</p>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="section-title">คำแนะนำ</div>
-    <div class="info-list">
-      <div class="info-item">
-        <div class="info-icon">🔐</div>
-        <div class="info-content">
-          <strong>จัดการรหัสผ่าน</strong>
-          <span>เปลี่ยนรหัสผ่านทันทีหากมีการใช้งานร่วมกันหรือพบความเสี่ยง</span>
-        </div>
+  <div class="profile-account-card">
+    <div class="profile-avatar">
+      <i class="fa-solid fa-user-nurse"></i>
+    </div>
+
+    <div class="profile-account-info">
+      <h2>ข้อมูลบัญชี</h2>
+
+      <div class="profile-info-row">
+        <span>ชื่อ</span>
+        <strong>{{ session.get('name') or session.get('staff_name') or session.get('username') }}</strong>
       </div>
-      <div class="info-item">
-        <div class="info-icon">🧪</div>
-        <div class="info-content">
-          <strong>บันทึกผลอย่างถูกต้อง</strong>
-          <span>ตรวจสอบหน่วยและช่วงค่าปกติก่อนบันทึกทุกครั้ง</span>
-        </div>
+
+      <div class="profile-info-row">
+        <span>Role</span>
+        <strong class="role-pill">{{ session.get('role') }}</strong>
       </div>
     </div>
   </div>
-</div>
 
-<div class="card" style="max-width:560px;">
-  <div class="section-title">เปลี่ยนรหัสผ่าน</div>
-  <form method="POST">
-    <div class="form-group">
-      <label>Password ใหม่</label>
-      <input type="password" name="new_password" class="input" required>
+  <div class="profile-bottom-grid compact-profile-grid">
+
+    <div class="card profile-password-card compact-password-card">
+      <div class="section-title">
+        <div class="mini-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <h2>เปลี่ยนรหัสผ่าน</h2>
+          <p>กรอกรหัสผ่านใหม่ของคุณ</p>
+        </div>
+      </div>
+
+      <form method="POST">
+        <div class="form-group">
+          <label>Password ใหม่</label>
+          <input type="password" name="password" class="input" required>
+        </div>
+
+        <div class="form-group">
+          <label>ยืนยัน Password</label>
+          <input type="password" name="confirm_password" class="input" required>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            บันทึกการเปลี่ยนแปลง
+          </button>
+        </div>
+      </form>
     </div>
-    <div class="form-group" style="margin-top:12px;">
-      <label>ยืนยัน Password</label>
-      <input type="password" name="confirm_password" class="input" required>
+
+    <div class="card profile-security-card compact-security-card">
+      <div class="section-title">
+        <div class="mini-icon">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <h2>คำแนะนำด้านความปลอดภัย</h2>
+        </div>
+      </div>
+
+      <div class="security-item">
+        <div class="mini-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <strong>ตั้งรหัสผ่านใหม่</strong>
+          <p>ควรมีความยาวอย่างน้อย 8 ตัวอักษร และไม่ใช้รหัสผ่านเดิมซ้ำ ประกอบด้วยอักษรพิมพ์เล็ก พิมพ์ใหญ่ และตัวเลข</p>
+        </div>
+      </div>
+
+      <div class="security-item">
+        <div class="mini-icon">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div>
+          <strong>ใช้งานบัญชีส่วนตัว</strong>
+          <p>หลีกเลี่ยงการแชร์บัญชีระหว่างบุคลากรหลายคน เพื่อความปลอดภัยของข้อมูล</p>
+        </div>
+      </div>
     </div>
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
-    </div>
-  </form>
+
+  </div>
+
 </div>
 {% endblock %}

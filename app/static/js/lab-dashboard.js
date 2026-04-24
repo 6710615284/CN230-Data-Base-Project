@@ -16,7 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const sortValue = sort.value;
-    if (sortValue === 'urgent-first') {
+    if (sortValue === 'default') {
+      rows.sort((a, b) => {
+        const orderA = Number(a.dataset.orderId || a.children[0].innerText.trim());
+        const orderB = Number(b.dataset.orderId || b.children[0].innerText.trim());
+        return orderA - orderB;
+      });
+    } else if (sortValue === 'urgent-first') {
       rows.sort((a, b) => {
         const pa = a.dataset.priority === 'urgent' ? 1 : 0;
         const pb = b.dataset.priority === 'urgent' ? 1 : 0;
@@ -36,4 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   filter.addEventListener('change', applyFilterAndSort);
   sort.addEventListener('change', applyFilterAndSort);
+  
+  applyFilterAndSort();
 });
